@@ -1,0 +1,590 @@
+---
+tags: 
+- 刷题
+- 算法
+date: 2026-06-15 01:50:55
+---
+
+`此篇为Hot100刷题笔记(Python版)，持续更新中`
+
+# 底层认知
+
+## 1. 算法评判基础：复杂度分析
+* **时间复杂度 (Time Complexity)**：衡量算法运行速度随数据规模 $n$ 增大的**增长趋势**。
+* **空间复杂度 (Space Complexity)**：衡量算法运行所需额外内存随数据规模 $n$ 增大的**增长趋势**。
+* **大 O 符号 (Big O Notation)**：忽略常数项和低阶项，只保留最高阶项。
+    * *示例*：精确操作次数为 $\frac{n(n-1)}{2} = \frac{1}{2}n^2 - \frac{1}{2}n$，化简后时间复杂度为 $O(n^2)$。
+* **常见复杂度等级 (从快到慢)**：$O(1)$ > $O(\log n)$ > $O(n)$ > $O(n \log n)$ > $O(n^2)$
+>   **核心策略：空间换时间**
+>   现代计算机内存充裕，面对海量数据时，通常优先优化时间复杂度，通过消耗额外空间换取极速查询。
+
+## 2. LeetCode 平台机制 (OJ 原理)
+LeetCode 后台是一个测试引擎。它会自动**导入**你写的 `Solution` 类，**实例化**对象，并将成百上千组测试用例循环传入你的核心函数，最后比对你的 `return` 结果。因此，刷题时无需编写文件读取或 `print` 等外围代码，100% 专注算法逻辑本身即可。
+
+# 哈希表 (Hash Table)
+
+## 1. 概念
+**本质**：本质就是python字典（只不过是先有哈希表再有字典）。
+
+**查询语法**：`if X in dict:`。**注意：`in` 关键字只搜索字典的“键 (Key)”，绝不会搜索“值 (Value)”。**
+
+**可哈希性 (谁能当字典的键？)**
+字典的底层逻辑要求键必须拥有**固定不变的指纹**。
+
+| 数据类型 | 能否当字典的键 | 为什么？ |
+| :--- | :--- | :--- |
+| **字符串 (String) / 数字** | **能** | 不可变，内容定死，指纹永远不变。 |
+| **元组 (Tuple)** | **能** | 不可变，不能增删改，指纹永远不变。 |
+| **列表 (List) / 字典** | **不能** | 可变，一旦内容被 `append` 或修改，哈希指纹改变，会导致找不到数据报错。 |
+
+## 2. 使用函数
+* **`enumerate(iterable, start=0)` (自动发号机)**
+    
+    在遍历时同时提取“索引”和“值”，避免使用丑陋的 `range(len())`。
+    ```python
+    for i, num in enumerate(nums):
+        # i 是索引，num 是数值
+    ```
+* **`dict[key]` vs `dict.get(key, 默认值)` (取值方式)**
+    
+    `dict[key]` 适合在**百分百确定键存在**时使用；如果键不存在，会直接抛出 `KeyError`。`dict.get(key, 默认值)` 更像安全取值，键不存在时不会报错，而是返回你给的默认值。
+    ```python
+    mp = {"apple": 2}
+
+    print(mp["apple"])        # 2
+    print(mp.get("banana", 0)) # 0，不报错
+    ```
+    刷题时的经验：如果数据来源未知、键不一定存在，用 `get()` 更稳；如果已经用 `if key in mp:` 判断过，后面再用 `mp[key]` 就很合适。
+* **`get()` 只负责查，不负责存**
+    
+    很容易误以为 `mp.get(key, 0)` 会把默认值写进字典，其实不会。它只是“临时拿出一个默认值给你用”，字典本身没有变化。
+    ```python
+    mp = {}
+
+    mp.get("apple", 0)
+    print(mp) # {}
+
+    mp["apple"] = mp.get("apple", 0) + 1
+    print(mp) # {"apple": 1}
+    ```
+    如果只是想“键不存在就先放进去”，可以用 `setdefault()`：
+    ```python
+    mp = {}
+    mp.setdefault("apple", 0)
+    print(mp) # {"apple": 0}
+    ```
+* **`collections.defaultdict(默认工厂)` (自带兜底的字典)**
+    
+    `defaultdict` 本质上还是字典，是 `dict` 的子类；只是在访问不存在的键时，会自动调用你传进去的“默认工厂”，创建一个默认值并存进字典。
+    ```python
+    import collections
+
+    mp = collections.defaultdict(list)
+    mp["a"]              # 自动执行 mp["a"] = list()，也就是 []
+    print(isinstance(mp, dict)) # True
+    ```
+    它不只能传 `list`，常见默认工厂还有：
+    ```python
+    groups = collections.defaultdict(list) # 默认值：[]，适合分组追加
+    count = collections.defaultdict(int)   # 默认值：0，适合计数
+    seen = collections.defaultdict(set)    # 默认值：set()，适合去重分组
+    info = collections.defaultdict(dict)   # 默认值：{}，适合嵌套记录
+    ```
+    重点是：传进去的东西要能像 `list()`、`int()`、`set()`、`dict()` 这样**不带参数直接调用**，因为它会在缺 key 时自动执行一次。
+
+    分组追加时，`defaultdict(list)` 比 `get()` 更省心。比如把单词按首字母分组：
+    ```python
+    # 错误示范：append 到了 get 临时造出来的列表里，没有写回字典
+    mp = {}
+    mp.get("a", []).append("apple")
+    print(mp) # {}
+
+    # 正确写法：键不存在时自动创建空列表，并真正挂到字典里
+    import collections
+    mp = collections.defaultdict(list)
+    mp["a"].append("apple")
+    print(mp) # {"a": ["apple"]}
+    ```
+    所以只要遇到“按某个 key 分组，然后不断 append”的题型，优先想到 `defaultdict(list)`；遇到词频统计，可以想到 `defaultdict(int)`。
+* **字符串重组：`sorted()` + `join()` / `tuple()`**
+    
+    `sorted(str)` 会返回一个**列表**，而列表是可变类型，不能直接做字典的键。必须化零为整：
+    ```python
+    sorted("tea") # ["a", "e", "t"]
+
+    key1 = "".join(sorted("tea"))   # "aet"，字符串可以做键
+    key2 = tuple(sorted("tea"))     # ("a", "e", "t")，元组也可以做键
+    ```
+    `join()` 的语法有点反直觉：**胶水在前，列表在后**。
+    ```python
+    "".join(["a", "e", "t"])            # "aet"
+    "-".join(["2026", "07", "07"])      # "2026-07-07"
+    ```
+    铁律：被拼接的列表里必须全是字符串。如果有数字，要先转成字符串。
+    ```python
+    "-".join(map(str, [2026, 7, 7]))    # "2026-7-7"
+    ```
+* **字典键的死规矩：必须可哈希**
+    
+    字典底层是哈希表，键必须是不可变对象。字符串、数字、元组可以当键；列表、字典不能当键。
+    ```python
+    mp = {}
+    mp[tuple(sorted("tea"))] = "tea" # 正确
+    # mp[sorted("tea")] = "tea"      # 错误：list 不能当键
+    ```
+* **`dict.values()` (提取字典里的所有值)**
+    
+    返回字典中所有值组成的视图对象，常配合 `list()` 转成列表。
+    ```python
+    groups = list(mp.values())
+    ```
+* **`set(iterable)` (集合去重)**
+    
+    将可迭代对象转换为集合{}，自动去重，并支持平均 $O(1)$ 的存在性查询。
+    ```python
+    num_set = set(nums)
+    ```
+* **`max(a, b)` (取最大值)**
+    
+    返回多个值中的最大值，常用于维护历史最优答案。
+    ```python
+    longest_streak = max(longest_streak, current_streak)
+    ```
+
+## 3. 题目
+### 题目 1：两数之和 (LeetCode 1)
+
+#### 原题
+给定一个整数数组 `nums` 和一个整数目标值 `target`，请你在该数组中找出 **和为目标值** `target` 的那 **两个** 整数，并返回它们的数组下标。
+你可以假设每种输入只会对应一个答案。但是，数组中同一个元素在答案里不能重复出现。
+你可以按任意顺序返回答案。
+
+
+#### 答案
+```python
+class Solution:
+    def twoSum(self, nums: List[int], target: int) -> List[int]:
+        hashtable = {} # 格式：{数值: 索引}
+        for i, num in enumerate(nums):
+            # 1. 计算需要的同伙数值
+            complement = target - num
+            # 2. 查哈希表：同伙是否已经登记过？
+            if complement in hashtable:
+                return [hashtable[complement], i]
+            # 3. 没找到：把自己登记到小本本上，供后续数字匹配
+            hashtable[num] = i
+        return []
+```
+
+#### 解析
+* **核心逻辑**：边遍历，边查找，边登记。
+* **为什么用哈希表**：我们需要频繁地“回头寻找”某个特定的数字是否出现过。哈希表可以将这种查找的时间复杂度从 $O(n)$ 降到 $O(1)$。
+* **巧妙之处**：“先查字典，后存自己”而不是“先存自己，再查字典”，这种执行顺序避开了重复数字相互覆盖的问题（例如 `[3, 3]` 找 `6`），也保证了绝不会在第一个数字就发生错误的匹配。
+
+---
+
+### 题目 2：字母异位词分组 (LeetCode 49)
+
+#### 原题
+给你一个字符串数组，请你将 **字母异位词** 组合在一起。可以按任意顺序返回结果列表。
+字母异位词是由重新排列源单词的所有字母得到的一个新单词。
+
+* **示例:** 输入: `strs = ["eat", "tea", "tan", "ate", "nat", "bat"]` -> 输出: `[["bat"],["nat","tan"],["ate","eat","tea"]]`
+
+#### 错误答案
+```python
+import collections
+
+class Solution:
+    def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
+        a=collections.defaultdict(list)
+        for i in strs:
+            j= sorted(i)
+            if j in a:
+                a[j].append(i)
+            else:
+                a.join(sorted(i))
+    return list(a.values)
+
+```
+
+#### 错误解析
+* **错误 1：`sorted(i)` 返回的是列表，不能当字典的键**
+    
+    `j = sorted(i)` 得到的是类似 `["a", "e", "t"]` 的列表。列表是可变对象，不能被哈希，所以这一句会出问题：
+    ```python
+    if j in a:
+    ```
+    因为 `a` 是字典，`j in a` 本质是在检查 `j` 这个键是否存在；但列表不能做键。应该先把它转成元组或字符串：
+    ```python
+    j = tuple(sorted(i))
+    # 或者
+    j = "".join(sorted(i))
+    ```
+* **错误 2：`a.join(sorted(i))` 不是合法操作**
+    
+    `join()` 是字符串的方法，不是字典的方法。也就是说，应该是“胶水字符串”在前：
+    ```python
+    "".join(sorted(i))
+    ```
+    但在这道题里，`join()` 的作用只是生成 key，不是把结果存进字典。真正要把单词放进分组里，应该写：
+    ```python
+    a[j].append(i)
+    ```
+* **错误 3：用了 `defaultdict(list)` 后，不需要再写 `if j in a`**
+    
+    `defaultdict(list)` 的意义就是：当 `a[j]` 不存在时，自动创建一个空列表。所以可以直接追加：
+    ```python
+    a[j].append(i)
+    ```
+    不需要手动判断 `if j in a`。
+* **错误 4：`return list(a.values)` 少了括号，而且缩进不对**
+    
+    `values` 是方法，必须调用：
+    ```python
+    return list(a.values())
+    ```
+    同时 `return` 必须缩进在 `groupAnagrams` 函数内部，否则就不是函数的返回值了。
+
+#### 正确答案
+```python
+import collections
+
+class Solution:
+    def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
+        # 使用自带兜底功能的字典，键不存在时自动创建空列表
+        mp = collections.defaultdict(list)
+        
+        for st in strs:
+            # 寻找统一特征：排序并转为不可变的元组作为键
+            key = tuple(sorted(st)) 
+            # 将原始单词挂载到对应键的列表中
+            mp[key].append(st)      
+            
+        # 提取所有的分组列表并返回
+        return list(mp.values())
+```
+
+#### 解析
+* **核心逻辑**：为所有打乱的单词寻找一个**统一的接头暗号**作为字典的键。如果两个单词是字母异位词，它们按字母表排序后的结果一定完全相同。
+* **底层踩坑**：`sorted()` 函数返回的是**列表**（可变类型），而 Python 字典要求键必须是不可变的（拥有固定指纹）。因此必须使用 `tuple()` 或 `"".join()` 将其转换为不可变的元组或字符串，才能安全地作为键。
+* **API 技巧**：`collections.defaultdict(list)` 省去了我们手动写 `if key not in mp:` 的判断逻辑，代码更加优雅。
+
+---
+
+### 题目 3：最长连续序列 (LeetCode 128)
+
+#### 原题
+给定一个未排序的整数数组 `nums` ，找出数字连续的最长序列（不要求序列元素在原数组中连续）的长度。
+请你设计并实现时间复杂度为 **$O(n)$** 的算法解决此问题。
+
+* **示例:** 输入: `nums = [100,4,200,1,3,2]` -> 输出: `4` 
+* **解释:** 最长数字连续序列是 `[1, 2, 3, 4]`。它的长度为 4。
+
+#### 答案
+```python
+class Solution:
+    def longestConsecutive(self, nums: List[int]) -> int:
+        # 将列表转换为集合 (Set)，本质上是只有键没有值的哈希表，实现 O(1) 查找并去重
+        num_set = set(nums) 
+        longest_streak = 0
+
+        for num in num_set:
+            # 核心剪枝逻辑：只有当 num - 1 不在集合中时，说明 num 是一个连续序列的“起点”
+            if num - 1 not in num_set:
+                current_num = num
+                current_streak = 1
+
+                # 顺藤摸瓜，不断去哈希表中寻找下一个连续数字
+                while current_num + 1 in num_set:
+                    current_num += 1
+                    current_streak += 1
+
+                # 更新历史最长记录
+                longest_streak = max(longest_streak, current_streak)
+
+        return longest_streak
+```
+
+#### 解析
+* **突破口**：题目要求时间复杂度 $O(n)$，直接封死了先用 `sort()` 排序（$O(n \log n)$）的路子。要想在乱序中快速寻找连续数字，必须借助哈希表的 $O(1)$ 查找能力。
+* **数据结构选择**：这道题我们只需要判断数字“存不存在”，不需要记录它的索引，所以我们使用 **集合 (`set`)**。它是极简版的字典。
+* **核心算法思维（剪枝）**：如果我们对集合里的每一个数都向上找一遍（比如遇到 `2` 找一遍，遇到 `3` 又找一遍），时间复杂度会退化。**绝妙的思路是找“序列的起点”**。
+    * 怎么判断一个数是起点？只要 `它减去 1` 的那个数**不在**集合里，它就是龙头！
+    * 我们只对“龙头”进行向上的循环计数。这样每个数字实际上最多只被遍历两次，完美达成 $O(n)$ 的时间复杂度要求。
+* **为什么 `for` 里面套 `while` 不是 $O(n^2)$？**
+    
+    不是所有“循环套循环”都一定是 $O(n^2)$，关键要看内层 `while` **总共执行了多少次**，而不是只看代码长得像嵌套。
+    
+    以 `nums = [100, 4, 200, 1, 3, 2]` 为例，集合是 `{1, 2, 3, 4, 100, 200}`：
+    * `num = 1` 时，`0` 不在集合里，所以 `1` 是起点，进入 `while`，一路检查 `2 -> 3 -> 4`。
+    * `num = 2` 时，`1` 在集合里，说明 `2` 不是起点，直接跳过，不再从 `2` 开始重复数 `2 -> 3 -> 4`。
+    * `num = 3` 时，`2` 在集合里，也跳过。
+    * `num = 4` 时，`3` 在集合里，也跳过。
+    
+    所以最长连续段 `[1, 2, 3, 4]` 只会被 `1` 这个起点完整扫描一次，不会被 `1、2、3、4` 分别重复扫描。外层 `for` 负责判断每个数字是不是起点，总共 $n$ 次；内层 `while` 只沿着真正的连续链往后走，所有链加起来最多也就是 $n$ 个数字。因此总复杂度是：
+    $$
+    O(n) + O(n) = O(n)
+    $$
+    真正会退化成 $O(n^2)$ 的写法，是不判断起点，遇到每个数字都向后扫一遍。
+
+# 双指针
+
+## 1. 概念
+
+**本质**：双指针并不是一种具体的数据结构，而是一种**用两个下标协同遍历数据**的算法技巧。两个指针通常分别记录不同的边界或状态，通过有规律地移动它们，减少无效枚举。
+
+如果用两层循环枚举所有元素对，时间复杂度通常是 $O(n^2)$；如果能根据题目的单调性判断“移动哪一边不可能错过答案”，双指针往往可以把复杂度降到 $O(n)$。
+
+常见的双指针可以分成两类：
+
+| 类型 | 初始位置 | 移动方式 | 常见用途 |
+| :--- | :--- | :--- | :--- |
+| **同向双指针（快慢指针）** | 都从左侧出发 | 两个指针向同一方向移动，但职责或速度不同 | 原地删除、数组分区、链表问题 |
+| **相向双指针（左右指针）** | 一个在最左，一个在最右 | 两个指针向中间靠拢 | 有序数组求和、盛水面积、回文判断 |
+
+> **核心前提：为什么可以移动指针？**
+> 双指针不是随便少算一些情况，而是利用题目中的**单调性、顺序或已知边界**，一次排除一批不可能成为答案的情况。写题时最重要的不是记住代码，而是能解释：当前为什么移动这个指针，以及被跳过的情况为什么不可能更优。
+
+## 2. 常用写法
+
+* **快慢指针：快指针负责探索，慢指针负责维护结果区间**
+
+    ```python
+    slow = 0
+    for fast in range(len(nums)):
+        if nums[fast] 满足保留条件:
+            nums[slow] = nums[fast]
+            slow += 1
+    ```
+
+    可以把数组想成两块：`[0, slow)` 是已经处理好的区域，`fast` 负责检查还没有处理的元素。
+
+* **左右指针：根据当前状态舍弃一侧**
+
+    ```python
+    left, right = 0, len(nums) - 1
+    while left < right:
+        if 应该移动左边:
+            left += 1
+        else:
+            right -= 1
+    ```
+
+    左右指针能成立的关键，是每次移动都必须有依据。例如在有序数组中，两数之和偏小就移动左指针，偏大就移动右指针。
+
+* **原地修改不等于不能使用额外变量**
+
+    “原地”通常表示不能再创建一个与输入规模相同的新数组，即额外空间应为 $O(1)$。使用 `left`、`right`、`count` 等少量变量仍然属于原地操作。
+
+* **Python 交换语法**
+
+    ```python
+    nums[left], nums[right] = nums[right], nums[left]
+    ```
+
+    Python 可以直接交换两个位置的值，不需要额外写一个临时变量。
+
+* **排序的复杂度不能忽略**
+
+    ```python
+    nums.sort()
+    ```
+
+    `list.sort()` 会原地修改列表，时间复杂度是 $O(n \log n)$。即使排序后的双指针只需要 $O(n)$，整个算法仍然是 $O(n \log n)$。
+
+## 3. 题目
+
+### 题目 1：移动零 (LeetCode 283)
+
+#### 原题
+
+给定一个数组 `nums`，编写一个函数将所有 `0` 移动到数组的末尾，同时保持非零元素的相对顺序。
+
+请注意，必须在不复制数组的情况下原地对数组进行操作。
+
+* **示例：** 输入：`nums = [0,1,0,3,12]` -> 修改后：`[1,3,12,0,0]`
+
+#### 答案
+
+```python
+class Solution:
+    def moveZeroes(self, nums: List[int]) -> None:
+        # slow 指向下一个应该放置非零元素的位置
+        slow = 0
+
+        # fast 负责寻找非零元素
+        for fast in range(len(nums)):
+            if nums[fast] != 0:
+                nums[slow], nums[fast] = nums[fast], nums[slow]
+                slow += 1
+```
+
+#### 解析
+
+* **指针分工**：`fast` 从左到右检查所有元素；`slow` 指向“下一个非零元素应该放到的位置”。
+* **核心逻辑**：当 `fast` 找到非零元素时，就把它与 `slow` 位置的元素交换，然后让 `slow` 向右移动。处理过程中，`[0, slow)` 始终保存着已经整理好的非零元素。
+* **为什么相对顺序不会改变**：`fast` 是从左到右依次发现非零元素的，它们也会按照被发现的先后顺序依次放到 `slow` 所指的位置，因此原有顺序不变。
+* **自己和自己交换没问题**：如果数组开头本来就是非零元素，可能出现 `slow == fast`。此时交换不会改变数组，也不影响正确性。若特别在意这次操作，也可以先判断 `slow != fast`，但没有必要。
+* **复杂度**：每个元素只检查一次，时间复杂度为 $O(n)$；只使用两个指针，空间复杂度为 $O(1)$。
+
+---
+
+### 题目 2：盛最多水的容器 (LeetCode 11)
+
+#### 原题
+
+给定一个长度为 `n` 的整数数组 `height`。有 `n` 条垂线，第 `i` 条线的两个端点是 `(i, 0)` 和 `(i, height[i])`。
+
+找出其中的两条线，使它们与横轴共同构成的容器可以容纳最多的水，返回容器可以储存的最大水量。
+
+* **示例：** 输入：`height = [1,8,6,2,5,4,8,3,7]` -> 输出：`49`
+
+#### 答案
+
+```python
+class Solution:
+    def maxArea(self, height: List[int]) -> int:
+        left, right = 0, len(height) - 1
+        max_area = 0
+
+        while left < right:
+            width = right - left
+            current_height = min(height[left], height[right])
+            max_area = max(max_area, width * current_height)
+
+            # 面积受较短的木板限制，只能尝试换掉短板
+            if height[left] < height[right]:
+                left += 1
+            else:
+                right -= 1
+
+        return max_area
+```
+
+#### 解析
+
+容器面积为：
+
+$$
+S = (right - left) \times \min(height[left], height[right])
+$$
+
+* **为什么从两端开始**：最左和最右两条线能提供最大的初始宽度，之后指针不断向中间收缩。
+* **为什么总是移动短板**：向内移动后，宽度一定变小。如果保留短板、移动长板，容器高度仍然不会超过原来的短板，高度没有变大的可能，面积就一定不会更大。因此只有换掉短板，才有机会用更高的线弥补宽度的损失。
+* **两边一样高时移动哪边**：任意移动一边都可以。代码选择移动右指针，因为保留其中一块同样高度的板，并不会漏掉更优解。
+* **复杂度**：左右指针最多各移动 `n - 1` 次，时间复杂度为 $O(n)$，空间复杂度为 $O(1)$。
+
+---
+
+### 题目 3：三数之和 (LeetCode 15)
+
+#### 原题
+
+给你一个整数数组 `nums`，判断是否存在三个元素 `nums[i]`、`nums[j]`、`nums[k]`，满足下标互不相同且三数之和为 `0`。请返回所有和为 `0` 且不重复的三元组。
+
+* **示例：** 输入：`nums = [-1,0,1,2,-1,-4]` -> 输出：`[[-1,-1,2],[-1,0,1]]`
+
+#### 答案
+
+```python
+class Solution:
+    def threeSum(self, nums: List[int]) -> List[List[int]]:
+        nums.sort()
+        answer = []
+        n = len(nums)
+
+        # i 是三元组中的第一个数，后两个数用左右指针寻找
+        for i in range(n - 2):
+            # 排序后第一个数已经大于 0，后面不可能再凑出 0
+            if nums[i] > 0:
+                break
+
+            # 跳过重复的第一个数
+            if i > 0 and nums[i] == nums[i - 1]:
+                continue
+
+            left, right = i + 1, n - 1
+
+            while left < right:
+                total = nums[i] + nums[left] + nums[right]
+
+                if total < 0:
+                    # 和太小，需要更大的数
+                    left += 1
+                elif total > 0:
+                    # 和太大，需要更小的数
+                    right -= 1
+                else:
+                    answer.append([nums[i], nums[left], nums[right]])
+                    left += 1
+                    right -= 1
+
+                    # 跳过重复的第二、第三个数
+                    while left < right and nums[left] == nums[left - 1]:
+                        left += 1
+                    while left < right and nums[right] == nums[right + 1]:
+                        right -= 1
+
+        return answer
+```
+
+#### 解析
+
+* **为什么先排序**：排序后数组具有单调性。固定第一个数 `nums[i]` 后，如果三数之和太小，就让 `left` 右移以增大总和；如果总和太大，就让 `right` 左移以减小总和。
+* **降维思路**：三数之和可以拆成“枚举第一个数 + 在剩余有序区间中寻找两数之和”。外层枚举需要 $O(n)$，内层双指针需要 $O(n)$。
+* **本题最容易错的是去重**：
+    * `i > 0 and nums[i] == nums[i - 1]`：避免使用相同的第一个数重复搜索。
+    * 找到答案后先同时收缩左右指针，再跳过与刚刚使用过的值相同的元素，避免生成重复三元组。
+    * 去重比较的是**数值**，不是禁止使用重复元素。例如 `[-1,-1,2]` 是合法答案，因为两个 `-1` 来自不同下标。
+* **为什么不能直接用集合解决所有去重问题**：可以最后把答案转成集合去重，但三元组需要先转成元组，而且会保存很多重复结果。排序后在搜索过程中去重更直接，也能避免无效计算。
+* **复杂度**：排序需要 $O(n \log n)$，外层循环配合双指针需要 $O(n^2)$，因此总时间复杂度为 $O(n^2)$；除返回结果和排序所需空间外，双指针本身只使用 $O(1)$ 额外空间。
+
+---
+
+### 题目 4：接雨水 (LeetCode 42)
+
+#### 原题
+
+给定 `n` 个非负整数表示每个宽度为 `1` 的柱子的高度图，计算按此排列的柱子，下雨之后能够接多少雨水。
+
+* **示例：** 输入：`height = [0,1,0,2,1,0,1,3,2,1,2,1]` -> 输出：`6`
+
+#### 答案
+
+```python
+class Solution:
+    def trap(self, height: List[int]) -> int:
+        left, right = 0, len(height) - 1
+        left_max = right_max = 0
+        water = 0
+
+        while left < right:
+            if height[left] < height[right]:
+                # 右边存在一根更高的柱子，左侧水位只由 left_max 决定
+                left_max = max(left_max, height[left])
+                water += left_max - height[left]
+                left += 1
+            else:
+                # 左边存在一根不矮于它的柱子，右侧水位只由 right_max 决定
+                right_max = max(right_max, height[right])
+                water += right_max - height[right]
+                right -= 1
+
+        return water
+```
+
+#### 解析
+
+对于位置 `i`，它能接到的雨水取决于左侧最高柱和右侧最高柱中较矮的那一个：
+
+$$
+water[i] = \min(left\_max[i], right\_max[i]) - height[i]
+$$
+
+* **双指针如何省空间**：常规做法可以分别创建两个数组，记录每个位置左侧和右侧的最大高度，但需要 $O(n)$ 额外空间。双指针只维护已经扫描过的 `left_max` 和 `right_max`，把空间降到 $O(1)$。
+* **为什么比较当前两端高度**：当 `height[left] < height[right]` 时，右侧当前就已经有一根比左柱更高的柱子，所以左侧这一格的短板只可能来自左边；此时可以放心结算 `left`。反之则可以结算 `right`。
+* **为什么先更新最大值再计算**：当前柱子如果刷新了这一侧的最高纪录，它本身不能接水，贡献应为 `0`。先执行 `max()` 后，`left_max - height[left]` 或 `right_max - height[right]` 自然就是 `0`，也避免出现负数。
+* **与“盛最多水的容器”的区别**：容器题只选择两根柱子，计算它们之间能装多少水；接雨水题则要计算**每一个凹槽位置**上方的水量并累加。两题都移动短的一侧，但维护的状态和答案含义不同。
+* **复杂度**：每个位置最多处理一次，时间复杂度为 $O(n)$；只使用左右指针、两侧最大值和累计水量，空间复杂度为 $O(1)$。
+
