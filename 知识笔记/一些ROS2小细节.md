@@ -1,96 +1,301 @@
 ---
-tags: 
-- ROS2
-- Ubuntu
-- Linux
+tags:
+  - ROS2
+  - Ubuntu
+  - Linux
 date: 2025-03-12 01:50:55
 ---
-# ROS2小细节
-这篇博客记载了一些小坷自己摸索的ros2的小细节，很基础但对初学者可能有用，毕竟教程一般不教这个。
 
-## 终端细节
-同一个终端内，source一次就够了，后续只需要colcon build。当然，新建终端之后要重新source
+# ROS 2 小细节
 
-终端里点击“上”就可以得到上一次输入的指令，在第一次指令输入错误需要再输一次又不想一个字一个字敲时很方便
+这篇笔记记录一些在学习和使用 ROS 2 时遇到的基础细节，同时补充少量 Linux 操作技巧。
 
-## ROS2代码细节
-Ctrl+/快速注释
+## 终端与工作空间
 
-Alt+上下键可以控制单行代码上下移动
+### `source` 与 `colcon build`
 
-**cat和xacro作为命令，后面拼接路径时记得加空格**
+同一个终端中，ROS 2 的系统环境通常只需要加载一次：
 
-光标放在某一行，无需选中任何，快速Ctrl c+Ctrl v可以实现一整行的复制粘贴
+```bash
+source /opt/ros/humble/setup.bash
+```
 
-名字里带有default的变量，表示默认的意思。一般来说，如果不指定，那么就按default来执行。如果指定了，那么按照制定了的来执行
+构建工作空间：
 
-ros2里常用单词含义
-| 英文单词 (English Term) | 中文含义 (Chinese Meaning) |
-| :--- | :--- |
+```bash
+cd ~/your_ws
+colcon build
+```
+
+第一次构建工作空间，或者新增了功能包、接口和可执行文件后，需要重新加载工作空间环境：
+
+```bash
+source install/setup.bash
+```
+
+新开终端后，需要重新执行相应的 `source` 命令。也可以把命令写入 `~/.bashrc`，让终端启动时自动加载。
+
+### 终端快捷操作
+
+- 按方向键 `↑` 可以调出上一条命令，适合快速修改并重新执行。
+- `Ctrl + C` 用于终止当前命令，不是复制。
+- Linux 终端中的复制和粘贴通常是 `Ctrl + Shift + C` 与 `Ctrl + Shift + V`。
+- 输入命令或文件名的一部分后按 `Tab`，可以自动补全。
+
+## 编辑代码时的快捷键
+
+以下是 VS Code 中常用的编辑操作：
+
+- `Ctrl + /`：注释或取消注释当前行。
+- `Alt + ↑` / `Alt + ↓`：向上或向下移动当前行。
+- 光标停在一行中时，直接按 `Ctrl + C` 再按 `Ctrl + V`，可以复制整行。
+- `Ctrl + F`：在当前文件中搜索。
+- `Ctrl + Shift + F`：在整个工程中搜索。
+
+> [!tip]
+> 将 `cat`、`xacro` 等命令与文件路径拼接时，中间必须保留空格。例如：`xacro robot.urdf.xacro`。
+
+## ROS 2 常用英文术语
+
+| 英文术语 | 中文含义 |
+| --- | --- |
 | package | 功能包 |
 | executable | 可执行文件 |
-| parameters/arguments | 参数 |
+| parameter | 参数 |
+| argument | 命令行参数 |
+| topic | 话题 |
+| service | 服务 |
 | sensor | 传感器 |
-| actuator | 执行机构 |
+| actuator | 执行器或执行机构 |
+| publisher | 发布者 |
+| subscriber | 订阅者 |
 
-## 区分传**parameters**和**arguments**的不同
+名称中包含 `default` 的变量通常表示“默认值”。调用者没有传入其他值时，程序会采用该默认值；显式传值后，则使用传入的值。
 
-parameters主要是给节点传参数，而parameters则相当于在命令行后面加内容
+## `parameters` 与 `arguments` 的区别
 
-有的xacro文件是执行器，有的xacro文件是插件，ros2是怎么判断的？他怎么知道哪个是插件？:XACRO 是一种宏语言，用于简化 URDF 的编写。它通过宏替换生成最终的 URDF 文件，而 ROS 2 和 Gazebo 仅解析最终的 URDF/SDF 文件中的标签。XACRO 文件本身没有“插件”或“执行器”的标记，插件和执行器的定义是通过 URDF/SDF 中的特定标签完成的。关键规则:
-* 标签层级：插件必须定义在特定标签内（如 <gazebo> 或 <ros2_control>）。
-* 插件标识：通过 <plugin> 标签显式声明，且必须包含插件的类型或动态库路径（如 filename="libgazebo_ros2_control.so"）。
-* 上下文语义：Gazebo 或 ros2_control 会根据标签的上下文判断是否需要加载插件。例如：Gazebo 会忽略 <ros2_control> 标签，只处理 <gazebo> 内的插件。
-ros2_control 会忽略 <gazebo> 标签，只处理 <ros2_control> 内的硬件接口。
+- **parameters**：ROS 2 节点参数，由节点的参数系统管理，可以在启动文件、YAML 文件或命令行中设置。
+- **arguments**：传递给可执行程序的普通命令行参数，由程序自行解析。
 
-## 其他
-所谓的urdf,sdf,xacro这些都只是文件的后缀名，用来描述该文件的类型，但其实他们本质都是xml格式的文件。
+Launch 文件中的简单示例：
 
-我对ros2control的通俗的理解：集成了一些控制器,感觉可以类比机器学习里的anaconda。
+```python
+from launch_ros.actions import Node
 
-rviz里，红色是x轴，绿色是y轴，蓝色是z轴
+robot_node = Node(
+    package="demo_package",
+    executable="demo_node",
+    parameters=[{"use_sim_time": True}],
+    arguments=["--verbose"],
+)
+```
 
-xacro或urdf出现报错：Check that :Your XML is well-formed，说明XML格式错误，如果实在找不出错误，那么常见原因：标签未闭合。将单行标签末尾从>改成/>
+这里的 `use_sim_time` 是 ROS 2 参数，`--verbose` 是传给程序的命令行参数。
 
-## 解决 `rclpy` 导入报错与环境配置
-* **现象**：终端运行正常，但在 VS Code 中 `import rclpy` 报黄色波浪线警告。
-* **原因**：VS Code 的 Python 插件默认只扫描标准库路径，不知道 ROS 2 的库在哪里。
-* **解决**：
-    1.  从已 source 过 ROS 环境的终端启动 VS Code (`code .`)。
-    2.  或在 `.vscode/settings.json` 中添加 `python.analysis.extraPaths`，指向 `/opt/ros/humble/lib/python3.10/site-packages`。
+## Xacro、URDF、SDF 与插件
 
-## 话题 (Topic) 与服务 (Service) 的核心区别
-* **通信模型**：
-    * **Topic**：单向广播（流式数据）。发布者只管发，不关心有没有人收。适用于雷达、图像等连续数据。
-    * **Service**：双向请求（一问一答）。客户端请求，服务端必须反馈。适用于开关、状态查询等瞬时操作。
-* **误区**：服务**不是**话题的上位替代，两者适用场景完全不同。
+URDF、SDF 和 Xacro 文件本质上都使用 XML 风格的语法，但用途不同：
 
-## 参数文件 (.yaml) 与服务定义 (.srv) 的区别
-* **YAML (.yaml)**：用于**存储具体数据**（配置存档）。例如机器人的颜色阈值、PID 参数。
-* **SRV (.srv)**：用于**定义接口结构**（通信合同）。定义请求包含什么字段（如 `int64 a`），响应包含什么字段（如 `int64 sum`），**不存储数值**。
+- **URDF**：描述机器人的连杆、关节、惯性和外观等信息。
+- **SDF**：描述 Gazebo 世界、模型、传感器和插件等内容，表达能力比 URDF 更丰富。
+- **Xacro**：一种 XML 宏语言，通过变量、宏和条件语句生成最终的 URDF/XML 内容。
 
-## `setup.py` 中 `data_files` 与 `entry_points` 的作用
-* **data_files**：**搬运工**。负责将非代码资源（Launch 文件、图片、Config）从源码目录复制到安装目录 (`install/share/`)。如果不写，程序运行时会找不到文件。
-* **entry_points**：**入口生成器**。负责将 Python 函数注册为终端可执行命令。
-    * 格式：`'命令名 = 包名.模块名:main函数'`。
+Xacro 文件本身不会被划分为“执行器文件”或“插件文件”。ROS 2 和 Gazebo 关注的是 Xacro 展开后生成的 URDF/SDF 标签。
 
-## 编写 Service 服务端 (`create_service`) 的易错点
-* **API**：`self.create_service(类型, '名称', 回调函数)`。
-* **致命细节**：回调函数 (`def callback(request, response):`) 执行完毕后，**必须 `return response`**。
-* **后果**：如果忘记 return，客户端会因为收不到响应而陷入死锁（一直等待）。
+判断插件和硬件接口时主要看以下标签：
 
-# Linux小细节
-这个不单独开一篇了，就放这里了
+- Gazebo 插件通常写在 `<gazebo>` 中，并通过 `<plugin>` 声明动态库。
+- `ros2_control` 的硬件接口写在 `<ros2_control>` 中。
+- Gazebo 主要处理 `<gazebo>` 中的插件配置。
+- `ros2_control` 根据 `<ros2_control>` 中的硬件与关节接口配置工作。
 
-## Linux终端
-Linux终端中的矩形光标很烦人，非常不直观。我的技巧：矩形的左端的边就是Windows里的光标的位置，这样就很好判断了
+示例：
 
-注意终端里的复制粘贴是ctrl+**shift**+c/v，单独按ctrl+c是取消当前操作
+```xml
+<gazebo>
+  <plugin filename="libgazebo_ros2_control.so"
+          name="gazebo_ros2_control"/>
+</gazebo>
+```
 
-## Linux如何安装软件：
-1. 到该软件的官网，找到Linux版本的下载包，选择64位Deb格式，点击下载
-2. 到“下载”文件夹中，点击右键，点击“在终端中打开”；或者直接打开终端，cd到下载。然后sudo dpkg -i +包名。例：sudo dpkg -i wps-office_11.1.0.10161_amd64.deb
+> [!warning]
+> 在正文中直接书写 `<gazebo>`、`<plugin>` 等 XML 标签时，应使用反引号包裹，否则 Obsidian 可能把它们当作 HTML 标签，导致后续 Markdown 渲染异常。
 
-## Linux如何卸载软件
-打开终端，然后sudo apt-get remove --purge +软件名称，如果不确定软件名称是什么，比如到底是wps还是wps2019，可以输入大概然后tab键补全。  
+## XML 标签未闭合报错
 
+如果 Xacro 或 URDF 报错并提示 `Check that your XML is well-formed`，通常表示 XML 格式不正确。常见原因包括：
+
+- 开始标签没有对应的结束标签；
+- 标签嵌套顺序错误；
+- 属性引号缺失；
+- 单标签结尾误写为 `>`，正确形式应为 `/>`。
+
+例如：
+
+```xml
+<!-- 错误：标签没有闭合 -->
+<mesh filename="robot.stl">
+
+<!-- 正确：自闭合标签 -->
+<mesh filename="robot.stl"/>
+```
+
+可以使用下面的命令检查 Xacro 是否能够正常展开：
+
+```bash
+xacro robot.urdf.xacro > /tmp/robot.urdf
+check_urdf /tmp/robot.urdf
+```
+
+## 解决 `rclpy` 导入警告
+
+### 现象
+
+终端中可以正常运行 ROS 2 节点，但 VS Code 对 `import rclpy` 显示黄色波浪线。
+
+### 原因
+
+VS Code 当前选择的 Python 解释器或 Pylance 搜索路径中没有 ROS 2 的 Python 包路径。
+
+### 解决方法
+
+方法一：从已经加载 ROS 2 环境的终端启动 VS Code。
+
+```bash
+source /opt/ros/humble/setup.bash
+code .
+```
+
+方法二：确认 VS Code 选择的 Python 解释器与 ROS 2 使用的 Python 版本一致。
+
+方法三：在 `.vscode/settings.json` 中添加额外搜索路径。以下路径仅适用于 Ubuntu 22.04 与 ROS 2 Humble 的常见安装环境，其他版本需要相应修改：
+
+```json
+{
+  "python.analysis.extraPaths": [
+    "/opt/ros/humble/lib/python3.10/site-packages"
+  ]
+}
+```
+
+## Topic 与 Service 的区别
+
+| 对比项 | Topic | Service |
+| --- | --- | --- |
+| 通信形式 | 发布/订阅 | 请求/响应 |
+| 数据方向 | 通常为单向数据流 | 一次请求对应一次响应 |
+| 耦合程度 | 发布者不要求订阅者同时在线 | 客户端需要等待服务端响应 |
+| 适用场景 | 雷达、图像、状态等连续数据 | 开关、计算、状态查询等离散操作 |
+
+> [!important]
+> Service 不是 Topic 的上位替代。两者解决的是不同类型的通信问题。
+
+## YAML 参数文件与 SRV 接口文件
+
+- **YAML（`.yaml`）**：保存具体配置数据，例如颜色阈值、PID 参数和控制器配置。
+- **SRV（`.srv`）**：定义服务请求与响应的数据结构，不负责保存运行时的具体数值。
+
+简单的 `.srv` 示例：
+
+```text
+int64 a
+int64 b
+---
+int64 sum
+```
+
+`---` 上方是请求字段，下方是响应字段。
+
+## `setup.py` 中的 `data_files` 与 `entry_points`
+
+### `data_files`
+
+`data_files` 负责把 Launch、Config、URDF 等非 Python 资源安装到工作空间的 `install/share/` 目录。如果资源没有被安装，节点运行时可能找不到相应文件。
+
+### `entry_points`
+
+`entry_points` 用于把 Python 函数注册为 ROS 2 可执行命令：
+
+```python
+entry_points={
+    "console_scripts": [
+        "demo_node = demo_package.demo_node:main",
+    ],
+}
+```
+
+格式为：
+
+```text
+命令名 = 包名.模块名:入口函数
+```
+
+## 编写 Service 服务端的易错点
+
+创建服务的常见写法：
+
+```python
+self.create_service(ServiceType, "service_name", self.callback)
+```
+
+回调函数需要返回响应对象：
+
+```python
+def callback(self, request, response):
+    response.sum = request.a + request.b
+    return response
+```
+
+如果忘记 `return response`，服务端无法正常返回有效响应，客户端可能持续等待、超时或产生运行时错误。
+
+## RViz 坐标轴颜色
+
+RViz 中默认使用以下颜色表示坐标轴：
+
+- 红色：X 轴；
+- 绿色：Y 轴；
+- 蓝色：Z 轴。
+
+# Linux 小细节
+
+## Linux 终端光标
+
+终端中的矩形光标表示当前字符位置。可以把矩形左边缘理解为常见竖线光标所在的位置。
+
+## 安装 Deb 软件包
+
+1. 从软件官网下载安装包，通常选择适合当前架构的 `.deb` 文件，例如 `amd64`。
+2. 在下载目录打开终端。
+3. 使用 `apt` 安装本地软件包，它会同时处理依赖：
+
+```bash
+cd ~/下载
+sudo apt install ./package_name_amd64.deb
+```
+
+也可以使用 `dpkg`：
+
+```bash
+sudo dpkg -i package_name_amd64.deb
+sudo apt --fix-broken install
+```
+
+## 卸载软件
+
+保留配置文件：
+
+```bash
+sudo apt remove package_name
+```
+
+同时删除系统级配置文件：
+
+```bash
+sudo apt purge package_name
+```
+
+如果不确定软件包的准确名称，可以先搜索：
+
+```bash
+apt list --installed 2>/dev/null | grep -i keyword
+```
