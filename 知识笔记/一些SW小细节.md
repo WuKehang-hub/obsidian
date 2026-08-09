@@ -4,10 +4,9 @@ tags:
   - 建模
 date: 2025-03-04 01:50:55
 ---
+![[img/post-solidworks-notes-cover.png|720]]
 
 # SolidWorks 建模小细节
-
-![[img/post-solidworks-notes-cover.png|640]]
 
 > [!abstract] 使用方法
 > SolidWorks 的基础建模并不难，真正容易浪费时间的是一些隐藏选项、操作顺序和装配细节。适合一边跟着教程练习，一边把容易忘记的操作记录下来。

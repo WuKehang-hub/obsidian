@@ -6,7 +6,6 @@ tags:
 date: 2025-03-03 01:50:55
 ---
 
-
 # 常用复制粘贴
 
 无需多言
@@ -309,5 +308,3 @@ def main():
         rclpy.spin(node)
         rclpy.shutdown()
 ```
-
-# 此篇博客持续更新中

@@ -3,6 +3,7 @@ tags:
 - Latex
 date: 2026-03-13 21:05:55
 ---
+![[img/post-latex-notes-cover.webp|720]]
 
 研一下，已经是开始写论文的阶段了。**Latex**相比于**Word**，在编写的时候不那么直观，但是胜在省事，不用纠结格式。
 
@@ -47,4 +48,3 @@ date: 2026-03-13 21:05:55
   * 一级标题：Markdown `#` → 对应 LaTeX `\section{你的标题}`（若是书籍排版则对应 `\chapter{你的标题}`）
   * 二级标题：Markdown `##` → 对应 LaTeX `\subsection{你的标题}`
   * 三级标题：Markdown `###` → 对应 LaTeX `\subsubsection{你的标题}`
-

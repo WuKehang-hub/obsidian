@@ -5,6 +5,7 @@ tags:
   - Linux
 date: 2025-03-12 01:50:55
 ---
+![[img/post-ros2-notes-cover.png|720]]
 
 # ROS 2 小细节
 

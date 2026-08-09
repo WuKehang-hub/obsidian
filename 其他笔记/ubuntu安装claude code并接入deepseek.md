@@ -4,6 +4,8 @@ tags:
 date: 2026-05-24 17:33:55
 ---
 
+![[img/post-claude-code-cover.png|720]]
+
 ## 第一步：准备环境（安装 Node.js）
 
 Claude Code 依赖 Node.js 环境，要求版本 **v18+**。推荐使用 `nvm`（Node Version Manager）来管理 Node.js 版本，避免全局权限冲突。

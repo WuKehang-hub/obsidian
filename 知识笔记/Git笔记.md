@@ -3,6 +3,7 @@ tags:
   - Git
 date: 2026-02-25 01:50:55
 ---
+![[img/post-git-notes-cover.png|720]]
 
 # 解决git clone很慢问题
 
