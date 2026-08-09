@@ -218,7 +218,7 @@ def generate_launch_description():
 **更新：从一开始就使用绝对路径并加上file://协议头就不会有这个问题了**
 ok，接下来就可以启动gazebo_sim.launch.py文件了，不出意外你将成功启动gazebo并且看到你的模型。
 
-如果打开模型之后，你发现你的模型关节自己在抽或者晃动，那么大概率是因为由于我们的urdf模型是自动生成的，所以关节和关节之间是没有摩擦力的，这就导致在重力的作用下，机器人模型的关节会自己晃动。解决办法很简单，就是**给添加每个joint摩擦力**。在 URDF 的<joint>标签内，通过<dynamics>子标签设置摩擦力。示例如下：
+如果打开模型之后，你发现你的模型关节自己在抽或者晃动，那么大概率是因为由于我们的urdf模型是自动生成的，所以关节和关节之间是没有摩擦力的，这就导致在重力的作用下，机器人模型的关节会自己晃动。解决办法很简单，就是**给每个 joint 添加摩擦力**。在 URDF 的 `<joint>` 标签内，通过 `<dynamics>` 子标签设置摩擦力。示例如下：
 ```xml
 <joint name="your_joint_name" type="revolute">
   <parent link="link1"/>
@@ -232,13 +232,17 @@ ok，接下来就可以启动gazebo_sim.launch.py文件了，不出意外你将�
 </joint>
 ```
 
-# 添加ros2_control
-在添加ros2_control之前，我们还需要对urdf文件进行必要的修改。
-如果你仔细观察会发现，在自动生成的URDF中，所有关节的<limit>标签中effort被设置为0：
+# 添加 ros2_control
+
+在添加 ros2_control 之前，我们还需要对 URDF 文件进行必要的修改。
+如果你仔细观察会发现，在自动生成的 URDF 中，所有关节的 `<limit>` 标签中 `effort` 被设置为 0：
+
 ```xml
 <limit lower="-3.14" upper="3.14" effort="0" velocity="0" />
 ```
+
 这会导致Gazebo拒绝任何力矩输入。需修改为合理值（例如effort="100"）：
+
 ```xml
 <limit lower="-3.14" upper="3.14" effort="100" velocity="10" />
 ```
