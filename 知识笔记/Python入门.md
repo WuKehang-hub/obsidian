@@ -273,7 +273,7 @@ print(a<=b)#True
 print(a==b)#False
 print(a!=b)#True
 ```
-==比较的是值还是标识呢？比较的是值
+比较的是值还是标识呢？比较的是值
 比较对象的标识用is
 ```python
 a=10

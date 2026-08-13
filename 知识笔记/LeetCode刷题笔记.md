@@ -185,18 +185,6 @@ LeetCode 后台是一个测试引擎。它会自动**导入**你写的 `Solution
     empty_dict = {}    # 空字典
     ```
 
-    集合还支持数学中的集合运算：
-
-    ```python
-    a = {1, 2, 3}
-    b = {3, 4, 5}
-
-    a | b  # 并集：{1, 2, 3, 4, 5}
-    a & b  # 交集：{3}
-    a - b  # 差集：{1, 2}
-    a ^ b  # 对称差集：{1, 2, 4, 5}
-    ```
-
     集合和字典都基于哈希表，但用途不同：字典保存的是 `键: 值` 映射，集合只关心某个元素**是否存在**。刷题时，如果不需要记录索引、次数或其他附加信息，只需要快速查存在性和去重，通常优先使用集合。
 * **`max(a, b)` (取最大值)**
     
@@ -769,6 +757,34 @@ $$
 
 > [!warning]
 > 题目要求的是**子串**，字符在原字符串中必须连续；不是可以跳过字符的子序列。
+
+==错误答案==
+```python
+class Solution:
+    def lengthOfLongestSubstring(self, s: str) -> int:
+	    window=set()
+	    left=0
+	    right=0
+	    ans=0
+	    n=len(s)
+	    while right<n:
+		    if s[right] not in window:
+			    window.add(s[right])
+			    right++
+			else:
+				left++
+				right++
+		ans=right-left+1
+	return ans
+```
+
+==错误解析==
+
+* Python 不支持 `left++`、`right++`，应写成 `left += 1`、`right += 1`；原代码的缩进也不统一，会产生语法错误。
+* 遇到重复字符时，只移动指针却没有执行 `window.remove(s[left])`，导致集合与实际窗口不一致。
+* 左边界可能需要连续移动多次，因此应使用 `while` 收缩窗口，直到重复字符被移除；此时不能同时移动 `right`，否则会跳过当前字符。
+* `ans` 应在每次窗口合法后通过 `max()` 更新，而不是循环结束后只计算一次。
+* 正确窗口为 `[left, right]` 时，长度才是 `right - left + 1`。
 
 ==答案==
 
