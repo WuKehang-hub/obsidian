@@ -8,7 +8,6 @@ tags:
 date: 2026-08-09
 ---
 
-# Markdown 笔记
 
 > [!abstract] 简介
 > Markdown 是一种轻量级标记语言。它使用少量符号表达标题、强调、链接、图片和代码等结构，适合用来编写技术文档与 Obsidian 笔记。
