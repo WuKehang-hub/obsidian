@@ -5,11 +5,9 @@ tags:
   - Linux
 date: 2025-03-12 01:50:55
 ---
-![[img/post-ros2-notes-cover.png|720]]
+![[附件/post-ros2-notes-cover.png|720]]
 
-# ROS 2 小细节
-
-这篇笔记记录一些在学习和使用 ROS 2 时遇到的基础细节，同时补充少量 Linux 操作技巧。
+这篇笔记记录一些在学习和使用 ROS 2 时遇到的基础细节。
 
 ## 终端与工作空间
 
@@ -256,47 +254,3 @@ RViz 中默认使用以下颜色表示坐标轴：
 - 红色：X 轴；
 - 绿色：Y 轴；
 - 蓝色：Z 轴。
-
-# Linux 小细节
-
-## Linux 终端光标
-
-终端中的矩形光标表示当前字符位置。可以把矩形左边缘理解为常见竖线光标所在的位置。
-
-## 安装 Deb 软件包
-
-1. 从软件官网下载安装包，通常选择适合当前架构的 `.deb` 文件，例如 `amd64`。
-2. 在下载目录打开终端。
-3. 使用 `apt` 安装本地软件包，它会同时处理依赖：
-
-```bash
-cd ~/下载
-sudo apt install ./package_name_amd64.deb
-```
-
-也可以使用 `dpkg`：
-
-```bash
-sudo dpkg -i package_name_amd64.deb
-sudo apt --fix-broken install
-```
-
-## 卸载软件
-
-保留配置文件：
-
-```bash
-sudo apt remove package_name
-```
-
-同时删除系统级配置文件：
-
-```bash
-sudo apt purge package_name
-```
-
-如果不确定软件包的准确名称，可以先搜索：
-
-```bash
-apt list --installed 2>/dev/null | grep -i keyword
-```

@@ -21,7 +21,7 @@ date: 2025-03-04 01:50:55
 （事后来看，这个决定**极其错误**，想法很美好，但忽略了一个问题：复杂模型和简单模型差别太大，很多坑只有复杂模型会遇到）
 
 找了个视频教程，教程中使用的是Moviet2，过程极其顺利，舵机很快就在Moviet2中可视化出来，并可以通过拉条控制旋转
-![[img/post-closed-chain-gazebo-robot-demo.png]]
+![[附件/post-closed-chain-gazebo-robot-demo.png]]
 
 信心大增，开始正式导入表情机器人模型
 
@@ -69,7 +69,7 @@ git clone https://github.com/olmerg/lesson_urdf.git
 
 **urdf不能实现闭链！！！**
 表情机器人里很多结构都是闭链结构，但是urdf不能实现这种结构，urdf只能a→b→c→d，但不能a→b→c→d→a，我学urdf的时候也没人告诉我，以至于当我在ros2里拖动拉条的时候才发现不对
-![[img/post-closed-chain-gazebo-urdf-notes.png]]
+![[附件/post-closed-chain-gazebo-urdf-notes.png]]
 想到的解决方法：
 1. 通过添加支持闭链的urdf插件，从而使得urdf具备实现闭链的能力
 2. 将urdf转成sdf。**SDF格式**是URDF格式的升级版，支持描述并联结构。（**更新：当时这个想法不对，urdf转sdf其实是导入到gazebo的必经之路，urdf无法直接导入gazebo。所以正确做法是修改urdf文件。拆掉闭环中的一个关节，让机器人变成一个开环机器人。一般来说，闭环结构中肯定会有一个无动力的关节（有的时候可能不止一个），拆掉这个关节即可。在URDF中，则体现为删除一个joint描述。生成urdf文件后，然后将上一步删除的joint添加上 `<gazebo>` 标签加回URDF中。这使得URDF再转换为SDF的过程中，这一块joint会被添加回生成的SDF中，从而补全闭环。这里将就看吧，后续会出一个从头到尾的详细教程**）

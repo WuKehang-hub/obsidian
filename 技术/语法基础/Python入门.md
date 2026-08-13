@@ -4,7 +4,7 @@ tags:
 - 编程
 date: 2025-03-04 01:50:55
 ---
-![[img/post-python-intro-cover.png|720]]
+![[附件/post-python-intro-cover.png|720]]
 
 # 写在开头
 “人生苦短，我用python”，作为最流行最好用的编程语言，非常好学，一学就会。

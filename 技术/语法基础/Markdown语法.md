@@ -122,9 +122,9 @@ if __name__ == "__main__":
 
 使用双方括号链接 Vault 内的其他笔记：
 
-- `[[知识笔记/Python入门]]` → [[知识笔记/Python入门]]
-- `[[知识笔记/Git笔记|Git 学习笔记]]` → [[知识笔记/Git笔记|Git 学习笔记]]
-- `[[知识笔记/ROS2常用代码模版#常用命令]]`：链接到指定标题
+- `[[技术/编程基础/Python入门]]` → [[技术/编程基础/Python入门]]
+- `[[技术/编程基础/Git|Git 学习笔记]]` → [[技术/编程基础/Git|Git 学习笔记]]
+- `[[技术/ROS与仿真/ROS2常用复制粘贴#常用复制粘贴]]`：链接到指定标题
 
 在链接前添加 `!` 可以嵌入另一篇笔记或其中的某个章节：
 
@@ -139,13 +139,13 @@ if __name__ == "__main__":
 本地图片推荐使用 Wiki 嵌入语法：
 
 ```markdown
-![[img/post-ros2-notes-cover.png]]
-![[img/post-ros2-notes-cover.png|480]]
+![[附件/post-ros2-notes-cover.png]]
+![[附件/post-ros2-notes-cover.png|480]]
 ```
 
 下面是设置宽度后的实际显示效果：
 
-![[img/post-ros2-notes-cover.png|480]]
+![[附件/post-ros2-notes-cover.png|480]]
 
 ### 网页图片
 

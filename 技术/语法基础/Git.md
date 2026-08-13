@@ -3,7 +3,7 @@ tags:
   - Git
 date: 2026-02-25 01:50:55
 ---
-![[img/post-git-notes-cover.png|720]]
+![[附件/post-git-notes-cover.png|720]]
 
 # 解决git clone很慢问题
 
@@ -134,7 +134,7 @@ proxy_on 7890
 
 **错误写法（仅本地 Windows 可见）**：
 ```markdown
-![[img/Fig5_3_路径规划总览.png]]
+![[附件/Fig5_3_路径规划总览.png]]
 ```
 
 # Git常用指令

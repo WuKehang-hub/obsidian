@@ -6,7 +6,7 @@ tags:
 date: 2025-03-10 01:50:55
 ---
 
-![[img/post-gazebo-startup-cover.png|720]]
+![[附件/post-gazebo-startup-cover.png|720]]
 
 # 问题描述
 版本为ubuntu22.04，ros2 humble

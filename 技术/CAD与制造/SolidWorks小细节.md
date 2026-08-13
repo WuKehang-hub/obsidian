@@ -4,7 +4,7 @@ tags:
   - 建模
 date: 2025-03-04 01:50:55
 ---
-![[img/post-solidworks-notes-cover.png|720]]
+![[附件/post-solidworks-notes-cover.png|720]]
 
 # SolidWorks 建模小细节
 

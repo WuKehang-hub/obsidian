@@ -4,7 +4,7 @@ tags:
 - ROS2
 date: 2025-03-19 01:50:55
 ---
-![[img/post-yaml-notes-cover.jpg|720]]
+![[附件/post-yaml-notes-cover.jpg|720]]
 
 # 什么是YAML
 我一向不喜欢故弄玄虚的定义，什么“数据序列化格式”，听着就头疼。我对yaml的理解就是一种配置语言，即**一种用来编写配置文件的格式**。类似于xml和json。

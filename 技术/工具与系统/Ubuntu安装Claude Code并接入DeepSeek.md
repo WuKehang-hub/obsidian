@@ -4,7 +4,7 @@ tags:
 date: 2026-05-24 17:33:55
 ---
 
-![[img/post-claude-code-cover.png|720]]
+![[附件/post-claude-code-cover.png|720]]
 
 ## 第一步：准备环境（安装 Node.js）
 
