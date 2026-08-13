@@ -39,13 +39,19 @@ LeetCode 后台是一个测试引擎。它会自动**导入**你写的 `Solution
 | **列表 (List) / 字典** | **不能** | 可变，一旦内容被 `append` 或修改，哈希指纹改变，会导致找不到数据报错。 |
 
 ## 2. 使用函数
-* **`enumerate(iterable, start=0)` (自动发号机)**
+* **`enumerate(iterable, start=0)`（同时获取索引和元素）**
     
-    在遍历时同时提取“索引”和“值”，避免使用丑陋的 `range(len())`。
+    可用于字符串、列表、元组等可迭代对象：
+
     ```python
     for i, num in enumerate(nums):
-        # i 是索引，num 是数值
+        # i 是索引，num 是元素
+
+    for i, ch in enumerate("abc"):
+        # ch 是当前字符
     ```
+
+    `start` 可以指定编号起点，例如 `enumerate(names, start=1)`。如果不需要索引，直接写 `for item in iterable` 即可。
 * **`dict[key]` vs `dict.get(key, 默认值)` (取值方式)**
     
     `dict[key]` 适合在**百分百确定键存在**时使用；如果键不存在，会直接抛出 `KeyError`。`dict.get(key, 默认值)` 更像安全取值，键不存在时不会报错，而是返回你给的默认值。
