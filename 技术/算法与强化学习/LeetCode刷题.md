@@ -7,29 +7,33 @@ date: 2026-06-15
 
 ==此篇为Hot100刷题笔记(Python版)==
 
-
 # 底层认知
 
 ## 1. 算法评判基础：复杂度分析
+
 * **时间复杂度 (Time Complexity)**：衡量算法运行速度随数据规模 $n$ 增大的**增长趋势**。
 * **空间复杂度 (Space Complexity)**：衡量算法运行所需额外内存随数据规模 $n$ 增大的**增长趋势**。
 * **大 O 符号 (Big O Notation)**：忽略常数项和低阶项，只保留最高阶项。
     * *示例*：精确操作次数为 $\frac{n(n-1)}{2} = \frac{1}{2}n^2 - \frac{1}{2}n$，化简后时间复杂度为 $O(n^2)$。
 * **常见复杂度等级 (从快到慢)**：$O(1)$ > $O(\log n)$ > $O(n)$ > $O(n \log n)$ > $O(n^2)$
+
 >   **核心策略：空间换时间**
 >   现代计算机内存充裕，面对海量数据时，通常优先优化时间复杂度，通过消耗额外空间换取极速查询。
 
 ## 2. LeetCode 平台机制 (OJ 原理)
+
 LeetCode 后台是一个测试引擎。它会自动**导入**你写的 `Solution` 类，**实例化**对象，并将成百上千组测试用例循环传入你的核心函数，最后比对你的 `return` 结果。因此，刷题时无需编写文件读取或 `print` 等外围代码，100% 专注算法逻辑本身即可。
 
 # 哈希表 (Hash Table)
 
 ## 1. 概念
+
 **本质**：本质就是python字典（只不过是先有哈希表再有字典）。
 
 **查询语法**：`if X in dict:`。**注意：`in` 关键字只搜索字典的“键 (Key)”，绝不会搜索“值 (Value)”。**
 
 **可哈希性 (谁能当字典的键？)**
+
 字典的底层逻辑要求键必须拥有**固定不变的指纹**。
 
 | 数据类型 | 能否当字典的键 | 为什么？ |
@@ -39,8 +43,9 @@ LeetCode 后台是一个测试引擎。它会自动**导入**你写的 `Solution
 | **列表 (List) / 字典** | **不能** | 可变，一旦内容被 `append` 或修改，哈希指纹改变，会导致找不到数据报错。 |
 
 ## 2. 使用函数
+
 * **`enumerate(iterable, start=0)`（同时获取索引和元素）**
-    
+
     可用于字符串、列表、元组等可迭代对象：
 
     ```python
@@ -52,19 +57,24 @@ LeetCode 后台是一个测试引擎。它会自动**导入**你写的 `Solution
     ```
 
     `start` 可以指定编号起点，例如 `enumerate(names, start=1)`。如果不需要索引，直接写 `for item in iterable` 即可。
+
 * **`dict[key]` vs `dict.get(key, 默认值)` (取值方式)**
-    
+
     `dict[key]` 适合在**百分百确定键存在**时使用；如果键不存在，会直接抛出 `KeyError`。`dict.get(key, 默认值)` 更像安全取值，键不存在时不会报错，而是返回你给的默认值。
+
     ```python
     mp = {"apple": 2}
 
     print(mp["apple"])        # 2
     print(mp.get("banana", 0)) # 0，不报错
     ```
+
     刷题时的经验：如果数据来源未知、键不一定存在，用 `get()` 更稳；如果已经用 `if key in mp:` 判断过，后面再用 `mp[key]` 就很合适。
+
 * **`get()` 只负责查，不负责存**
-    
+
     很容易误以为 `mp.get(key, 0)` 会把默认值写进字典，其实不会。它只是“临时拿出一个默认值给你用”，字典本身没有变化。
+
     ```python
     mp = {}
 
@@ -74,15 +84,19 @@ LeetCode 后台是一个测试引擎。它会自动**导入**你写的 `Solution
     mp["apple"] = mp.get("apple", 0) + 1
     print(mp) # {"apple": 1}
     ```
+
     如果只是想“键不存在就先放进去”，可以用 `setdefault()`：
+
     ```python
     mp = {}
     mp.setdefault("apple", 0)
     print(mp) # {"apple": 0}
     ```
+
 * **`collections.defaultdict(默认工厂)` (自带兜底的字典)**
-    
+
     `defaultdict` 本质上还是字典，是 `dict` 的子类；只是在访问不存在的键时，会自动调用你传进去的“默认工厂”，创建一个默认值并存进字典。
+
     ```python
     import collections
 
@@ -90,16 +104,20 @@ LeetCode 后台是一个测试引擎。它会自动**导入**你写的 `Solution
     mp["a"]              # 自动执行 mp["a"] = list()，也就是 []
     print(isinstance(mp, dict)) # True
     ```
+
     它不只能传 `list`，常见默认工厂还有：
+
     ```python
     groups = collections.defaultdict(list) # 默认值：[]，适合分组追加
     count = collections.defaultdict(int)   # 默认值：0，适合计数
     seen = collections.defaultdict(set)    # 默认值：set()，适合去重分组
     info = collections.defaultdict(dict)   # 默认值：{}，适合嵌套记录
     ```
+
     重点是：传进去的东西要能像 `list()`、`int()`、`set()`、`dict()` 这样**不带参数直接调用**，因为它会在缺 key 时自动执行一次。
 
     分组追加时，`defaultdict(list)` 比 `get()` 更省心。比如把单词按首字母分组：
+
     ```python
     # 错误示范：append 到了 get 临时造出来的列表里，没有写回字典
     mp = {}
@@ -112,41 +130,53 @@ LeetCode 后台是一个测试引擎。它会自动**导入**你写的 `Solution
     mp["a"].append("apple")
     print(mp) # {"a": ["apple"]}
     ```
+
     所以只要遇到“按某个 key 分组，然后不断 append”的题型，优先想到 `defaultdict(list)`；遇到词频统计，可以想到 `defaultdict(int)`。
+
 * **字符串重组：`sorted()` + `join()` / `tuple()`**
-    
+
     `sorted(str)` 会返回一个**列表**，而列表是可变类型，不能直接做字典的键。必须化零为整：
+
     ```python
     sorted("tea") # ["a", "e", "t"]
 
     key1 = "".join(sorted("tea"))   # "aet"，字符串可以做键
     key2 = tuple(sorted("tea"))     # ("a", "e", "t")，元组也可以做键
     ```
+
     `join()` 的语法有点反直觉：**胶水在前，列表在后**。
+
     ```python
     "".join(["a", "e", "t"])            # "aet"
     "-".join(["2026", "07", "07"])      # "2026-07-07"
     ```
+
     铁律：被拼接的列表里必须全是字符串。如果有数字，要先转成字符串。
+
     ```python
     "-".join(map(str, [2026, 7, 7]))    # "2026-7-7"
     ```
+
 * **字典键的死规矩：必须可哈希**
-    
+
     字典底层是哈希表，键必须是不可变对象。字符串、数字、元组可以当键；列表、字典不能当键。
+
     ```python
     mp = {}
     mp[tuple(sorted("tea"))] = "tea" # 正确
     # mp[sorted("tea")] = "tea"      # 错误：list 不能当键
     ```
+
 * **`dict.values()` (提取字典里的所有值)**
-    
+
     返回字典中所有值组成的视图对象，常配合 `list()` 转成列表。
+
     ```python
     groups = list(mp.values())
     ```
+
 * **`set(iterable)`（创建集合）**
-    
+
     `set()` 是 Python 用来**创建集合（Set）** 的内置函数。集合是一种只保存唯一元素的数据结构：同一个值无论加入多少次，在集合中都只会保留一份。
 
     ```python
@@ -192,23 +222,29 @@ LeetCode 后台是一个测试引擎。它会自动**导入**你写的 `Solution
     ```
 
     集合和字典都基于哈希表，但用途不同：字典保存的是 `键: 值` 映射，集合只关心某个元素**是否存在**。刷题时，如果不需要记录索引、次数或其他附加信息，只需要快速查存在性和去重，通常优先使用集合。
+
 * **`max(a, b)` (取最大值)**
-    
+
     返回多个值中的最大值，常用于维护历史最优答案。
+
     ```python
     longest_streak = max(longest_streak, current_streak)
     ```
 
 ## 3. 题目
+
 ### 题目 1：两数之和（LeetCode 1，简单）
 
 ==原题==
+
 给定一个整数数组 `nums` 和一个整数目标值 `target`，请你在该数组中找出 **和为目标值** `target` 的那 **两个** 整数，并返回它们的数组下标。
+
 你可以假设每种输入只会对应一个答案。但是，数组中同一个元素在答案里不能重复出现。
+
 你可以按任意顺序返回答案。
 
-
 ==答案==
+
 ```python
 class Solution:
     def twoSum(self, nums: List[int], target: int) -> List[int]:
@@ -225,6 +261,7 @@ class Solution:
 ```
 
 ==解析==
+
 * **核心逻辑**：边遍历，边查找，边登记。
 * **为什么用哈希表**：我们需要频繁地“回头寻找”某个特定的数字是否出现过。哈希表可以将这种查找的时间复杂度从 $O(n)$ 降到 $O(1)$。
 * **巧妙之处**：“先查字典，后存自己”而不是“先存自己，再查字典”，这种执行顺序避开了重复数字相互覆盖的问题（例如 `[3, 3]` 找 `6`），也保证了绝不会在第一个数字就发生错误的匹配。
@@ -234,12 +271,15 @@ class Solution:
 ### 题目 2：字母异位词分组（LeetCode 49，中等）
 
 ==原题==
+
 给你一个字符串数组，请你将 **字母异位词** 组合在一起。可以按任意顺序返回结果列表。
+
 字母异位词是由重新排列源单词的所有字母得到的一个新单词。
 
 * **示例:** 输入: `strs = ["eat", "tea", "tan", "ate", "nat", "bat"]` -> 输出: `[["bat"],["nat","tan"],["ate","eat","tea"]]`
 
 ==错误答案==
+
 ```python
 import collections
 
@@ -257,40 +297,53 @@ class Solution:
 ```
 
 * **错误 1：`sorted(i)` 返回的是列表，不能当字典的键**
-    
+
     `j = sorted(i)` 得到的是类似 `["a", "e", "t"]` 的列表。列表是可变对象，不能被哈希，所以这一句会出问题：
+
     ```python
     if j in a:
     ```
+
     因为 `a` 是字典，`j in a` 本质是在检查 `j` 这个键是否存在；但列表不能做键。应该先把它转成元组或字符串：
+
     ```python
     j = tuple(sorted(i))
     # 或者
     j = "".join(sorted(i))
     ```
+
 * **错误 2：`a.join(sorted(i))` 不是合法操作**
-    
+
     `join()` 是字符串的方法，不是字典的方法。也就是说，应该是“胶水字符串”在前：
+
     ```python
     "".join(sorted(i))
     ```
+
     但在这道题里，`join()` 的作用只是生成 key，不是把结果存进字典。真正要把单词放进分组里，应该写：
+
     ```python
     a[j].append(i)
     ```
+
 * **错误 3：用了 `defaultdict(list)` 后，不需要再写 `if j in a`**
-    
+
     `defaultdict(list)` 的意义就是：当 `a[j]` 不存在时，自动创建一个空列表。所以可以直接追加：
+
     ```python
     a[j].append(i)
     ```
+
     不需要手动判断 `if j in a`。
+
 * **错误 4：`return list(a.values)` 少了括号，而且缩进不对**
-    
+
     `values` 是方法，必须调用：
+
     ```python
     return list(a.values())
     ```
+
     同时 `return` 必须缩进在 `groupAnagrams` 函数内部，否则就不是函数的返回值了。
 
 ==正确答案==
@@ -302,18 +355,19 @@ class Solution:
     def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
         # 使用自带兜底功能的字典，键不存在时自动创建空列表
         mp = collections.defaultdict(list)
-        
+
         for st in strs:
             # 寻找统一特征：排序并转为不可变的元组作为键
-            key = tuple(sorted(st)) 
+            key = tuple(sorted(st))
             # 将原始单词挂载到对应键的列表中
-            mp[key].append(st)      
-            
+            mp[key].append(st)
+
         # 提取所有的分组列表并返回
         return list(mp.values())
 ```
 
 ==解析==
+
 * **核心逻辑**：为所有打乱的单词寻找一个**统一的接头暗号**作为字典的键。如果两个单词是字母异位词，它们按字母表排序后的结果一定完全相同。
 * **底层踩坑**：`sorted()` 函数返回的是**列表**（可变类型），而 Python 字典要求键必须是不可变的（拥有固定指纹）。因此必须使用 `tuple()` 或 `"".join()` 将其转换为不可变的元组或字符串，才能安全地作为键。
 * **API 技巧**：`collections.defaultdict(list)` 省去了我们手动写 `if key not in mp:` 的判断逻辑，代码更加优雅。
@@ -323,18 +377,21 @@ class Solution:
 ### 题目 3：最长连续序列（LeetCode 128，中等）
 
 ==原题==
+
 给定一个未排序的整数数组 `nums` ，找出数字连续的最长序列（不要求序列元素在原数组中连续）的长度。
+
 请你设计并实现时间复杂度为 **$O(n)$** 的算法解决此问题。
 
-* **示例:** 输入: `nums = [100,4,200,1,3,2]` -> 输出: `4` 
+* **示例:** 输入: `nums = [100,4,200,1,3,2]` -> 输出: `4`
 * **解释:** 最长数字连续序列是 `[1, 2, 3, 4]`。它的长度为 4。
 
 ==答案==
+
 ```python
 class Solution:
     def longestConsecutive(self, nums: List[int]) -> int:
         # 将列表转换为集合 (Set)，本质上是只有键没有值的哈希表，实现 O(1) 查找并去重
-        num_set = set(nums) 
+        num_set = set(nums)
         longest_streak = 0
 
         for num in num_set:
@@ -355,25 +412,30 @@ class Solution:
 ```
 
 ==解析==
+
 * **突破口**：题目要求时间复杂度 $O(n)$，直接封死了先用 `sort()` 排序（$O(n \log n)$）的路子。要想在乱序中快速寻找连续数字，必须借助哈希表的 $O(1)$ 查找能力。
 * **数据结构选择**：这道题我们只需要判断数字“存不存在”，不需要记录它的索引，所以我们使用 **集合 (`set`)**。它是极简版的字典。
 * **核心算法思维（剪枝）**：如果我们对集合里的每一个数都向上找一遍（比如遇到 `2` 找一遍，遇到 `3` 又找一遍），时间复杂度会退化。**绝妙的思路是找“序列的起点”**。
     * 怎么判断一个数是起点？只要 `它减去 1` 的那个数**不在**集合里，它就是龙头！
     * 我们只对“龙头”进行向上的循环计数。这样每个数字实际上最多只被遍历两次，完美达成 $O(n)$ 的时间复杂度要求。
 * **为什么 `for` 里面套 `while` 不是 $O(n^2)$？**
-    
+
     不是所有“循环套循环”都一定是 $O(n^2)$，关键要看内层 `while` **总共执行了多少次**，而不是只看代码长得像嵌套。
-    
+
     以 `nums = [100, 4, 200, 1, 3, 2]` 为例，集合是 `{1, 2, 3, 4, 100, 200}`：
     * `num = 1` 时，`0` 不在集合里，所以 `1` 是起点，进入 `while`，一路检查 `2 -> 3 -> 4`。
     * `num = 2` 时，`1` 在集合里，说明 `2` 不是起点，直接跳过，不再从 `2` 开始重复数 `2 -> 3 -> 4`。
     * `num = 3` 时，`2` 在集合里，也跳过。
     * `num = 4` 时，`3` 在集合里，也跳过。
-    
+
     所以最长连续段 `[1, 2, 3, 4]` 只会被 `1` 这个起点完整扫描一次，不会被 `1、2、3、4` 分别重复扫描。外层 `for` 负责判断每个数字是不是起点，总共 $n$ 次；内层 `while` 只沿着真正的连续链往后走，所有链加起来最多也就是 $n$ 个数字。因此总复杂度是：
+
     $$
+
     O(n) + O(n) = O(n)
+
     $$
+
     真正会退化成 $O(n^2)$ 的写法，是不判断起点，遇到每个数字都向后扫一遍。
 
 # 双指针
@@ -452,7 +514,9 @@ class Solution:
 请注意，必须在不复制数组的情况下原地对数组进行操作。
 
 * **示例：** 输入：`nums = [0,1,0,3,12]` -> 修改后：`[1,3,12,0,0]`
+
 ==错误答案==
+
 ```python
 class Solution:
     def moveZeroes(self, nums: List[int]) -> None:
@@ -460,10 +524,13 @@ class Solution:
 	    for fast in len(nums)：
 		    if nums[fast]!=0:
 			    nums[slow],nums[fast]=nums[fast],nums[slow]
-			    slow=slow+1		    
+			    slow=slow+1
 ```
-写成 `for right in len(nums):`，Python 会直接报错：  
+
+写成 `for right in len(nums):`，Python 会直接报错：
+
 `TypeError: 'int' object is not iterable`（整数对象不可迭代）。
+
 ==答案==
 
 ```python
@@ -526,7 +593,9 @@ class Solution:
 容器面积为：
 
 $$
+
 S = (right - left) \times \min(height[left], height[right])
+
 $$
 
 * **为什么从两端开始**：最左和最右两条线能提供最大的初始宽度，之后指针不断向中间收缩。
@@ -541,6 +610,7 @@ $$
 ==原题==
 
 给你一个整数数组 `nums`，判断是否存在三个元素 `nums[i]`、`nums[j]`、`nums[k]`，满足下标互不相同且三数之和为 `0`。请返回所有和为 `0` 且不重复的三元组。
+
 ```python
 class Solution:
     def threeSum(self, nums: List[int]) -> List[List[int]]:
@@ -642,7 +712,9 @@ class Solution:
 对于位置 `i`，它能接到的雨水取决于左侧最高柱和右侧最高柱中较矮的那一个：
 
 $$
+
 water[i] = \min(left\_max[i], right\_max[i]) - height[i]
+
 $$
 
 * **双指针如何省空间**：常规做法可以分别创建两个数组，记录每个位置左侧和右侧的最大高度，但需要 $O(n)$ 额外空间。双指针只维护已经扫描过的 `left_max` 和 `right_max`，把空间降到 $O(1)$。
@@ -660,13 +732,17 @@ $$
 窗口可以理解为字符串或数组中的一个连续片段：
 
 $$
+
 [left, right]
+
 $$
 
 窗口长度为：
 
 $$
+
 right - left + 1
+
 $$
 
 滑动窗口的核心不是“真的截取一个新数组”，而是通过两个下标和额外的数据结构，维护当前区间内的信息。
@@ -761,10 +837,10 @@ $$
 * **示例 2：** 输入：`s = "bbbbb"` -> 输出：`1`。
 * **示例 3：** 输入：`s = "pwwkew"` -> 输出：`3`，最长子串可以是 `"wke"`。
 
-> [!warning]
 > 题目要求的是**子串**，字符在原字符串中必须连续；不是可以跳过字符的子序列。
 
 ==错误答案==
+
 ```python
 class Solution:
     def lengthOfLongestSubstring(self, s: str) -> int:
@@ -905,8 +981,11 @@ class Solution:
 * **前缀和**
 
     `prefix[i]` 表示前 `i` 个元素之和，则区间 `[left, right]` 的和为：
+
     $$
+
     prefix[right + 1] - prefix[left]
+
     $$
 
     ```python

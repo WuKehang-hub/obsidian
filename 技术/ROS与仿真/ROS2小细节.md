@@ -5,6 +5,7 @@ tags:
   - Linux
 date: 2025-03-12
 ---
+
 ![[附件/post-ros2-notes-cover.png|720]]
 
 这篇笔记记录一些在学习和使用 ROS 2 时遇到的基础细节。
@@ -51,7 +52,6 @@ source install/setup.bash
 - `Ctrl + F`：在当前文件中搜索。
 - `Ctrl + Shift + F`：在整个工程中搜索。
 
-> [!tip]
 > 将 `cat`、`xacro` 等命令与文件路径拼接时，中间必须保留空格。例如：`xacro robot.urdf.xacro`。
 
 ## ROS 2 常用英文术语
@@ -117,7 +117,6 @@ Xacro 文件本身不会被划分为“执行器文件”或“插件文件”�
 </gazebo>
 ```
 
-> [!warning]
 > 在正文中直接书写 `<gazebo>`、`<plugin>` 等 XML 标签时，应使用反引号包裹，否则 Obsidian 可能把它们当作 HTML 标签，导致后续 Markdown 渲染异常。
 
 ## XML 标签未闭合报错
@@ -186,7 +185,6 @@ code .
 | 耦合程度 | 发布者不要求订阅者同时在线 | 客户端需要等待服务端响应 |
 | 适用场景 | 雷达、图像、状态等连续数据 | 开关、计算、状态查询等离散操作 |
 
-> [!important]
 > Service 不是 Topic 的上位替代。两者解决的是不同类型的通信问题。
 
 ## YAML 参数文件与 SRV 接口文件
@@ -254,3 +252,35 @@ RViz 中默认使用以下颜色表示坐标轴：
 - 红色：X 轴；
 - 绿色：Y 轴；
 - 蓝色：Z 轴。
+
+## ROS 2 与 Gazebo 桥接器（ros_gz_bridge）语法
+
+在 Launch 文件中配置 `parameter_bridge` 时，字符串格式非常严谨，核心公式为：
+
+`话题名称@ROS数据类型<方向号>Gazebo数据类型`
+
+**1. 符号含义：**
+
+- `@`：分隔符，分隔话题名称和数据类型。
+- `]`：单向通信，数据从 **ROS 2 流向 Gazebo**（例如：下发控制指令、推力）。
+- `[`：单向通信，数据从 **Gazebo 流向 ROS 2**（例如：获取传感器数据、Odometry 里程计位置）。
+- `@` 或 `==` (有些版本支持双向)：双向通信。
+
+**2. 核心代码结构：**
+
+```python
+from launch_ros.actions import Node
+
+# 1. 定义桥接规则列表
+bridge_params = [
+    '/topic_name@ros_type]gz_type', # ROS -> Gazebo
+]
+
+# 2. 创建 Node 节点
+bridge = Node(
+    package='ros_gz_bridge',
+    executable='parameter_bridge',
+    arguments=bridge_params,
+    output='screen'
+)
+```

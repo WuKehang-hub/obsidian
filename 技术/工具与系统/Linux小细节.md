@@ -4,6 +4,7 @@ tags:
   - Ubuntu
 date: 2026-08-13
 ---
+
 这篇笔记记录日常使用 Linux 时的基础操作。
 
 ## Linux 终端光标
@@ -47,4 +48,3 @@ sudo apt purge package_name
 ```bash
 apt list --installed 2>/dev/null | grep -i keyword
 ```
-

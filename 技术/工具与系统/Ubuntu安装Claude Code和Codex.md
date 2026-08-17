@@ -3,6 +3,7 @@ tags:
   - claude
 date: 2026-05-24
 ---
+
 # Ubuntu安装Claude Code并介入DeepSeek
 
 ![[附件/post-claude-code-cover.png|720]]
@@ -128,7 +129,6 @@ claude
 
 Codex CLI 是运行在终端中的 Codex 客户端。它可以读取当前项目、修改文件、运行命令并协助完成编程任务。
 
-> [!TIP]
 > 前文已经通过 NVM 安装了 Node.js，因此可以直接复用现有的 Node.js 和 npm 环境。
 
 ## 1. 检查 Node.js 和 npm
@@ -164,7 +164,6 @@ codex --help
 
 只要能正常输出版本号和帮助信息，就说明 CLI 已安装成功。
 
-> [!WARNING]
 > 如果 Node.js 是通过 NVM 安装的，通常不要在 npm 命令前添加 `sudo`，否则可能导致权限和路径混乱。
 
 ## 3. 登录 Codex
@@ -185,7 +184,6 @@ codex login
 cd ~/Projects/your-project
 codex
 ```
-
 
 Codex 会以当前目录作为工作目录，因此建议从具体的项目文件夹中启动，而不要直接在整个主目录中运行。
 
@@ -214,5 +212,4 @@ npm install --global @openai/codex@latest
 npm uninstall --global @openai/codex
 ```
 
-> [!NOTE]
 > Codex 可以执行命令和修改文件。在重要项目中使用前，建议先提交 Git 快照，并在执行敏感命令前仔细检查操作内容。

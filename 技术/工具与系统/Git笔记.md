@@ -3,9 +3,8 @@ tags:
   - Git
 date: 2026-02-25
 ---
-![[附件/post-git-notes-cover.png|720]]
 
-# Git 使用笔记
+![[附件/post-git-notes-cover.png|720]]
 
 Git 是一个**分布式版本控制系统**，用于记录文件变化、协作开发以及在需要时恢复历史版本。
 
@@ -28,7 +27,6 @@ git --version
 
 只要能够输出类似 `git version 2.x.x` 的内容，就说明安装成功。
 
-> [!NOTE]
 > 如果使用的是 Windows，可以从 [Git 官网](https://git-scm.com/downloads) 下载 Git for Windows；本篇主要记录 Ubuntu 下的使用方法。
 
 ## 二、首次配置
@@ -126,7 +124,6 @@ git commit -m "修改说明"
 git push
 ```
 
-> [!IMPORTANT]
 > `git add` 只是把修改放入暂存区，`git commit` 才会生成本地提交，`git push` 则把本地提交上传到远程仓库。
 
 ## 五、连接 GitHub 远程仓库
@@ -167,7 +164,6 @@ git pull
 
 如果多人同时修改同一个文件，拉取时可能出现冲突，需要手动选择保留的内容，然后重新提交。
 
-> [!TIP]
 > 拉取前最好先通过 `git status` 检查本地是否存在尚未提交的修改。
 
 ## 七、日常分支操作
@@ -249,7 +245,6 @@ proxy_on 7890   # 使用指定端口
 proxy_off       # 取消当前终端的代理
 ```
 
-> [!NOTE]
 > 这种写法是把“代理开关函数”永久保存到 `.bashrc`，并不是每次打开终端都自动启用代理。只有执行 `proxy_on` 的当前终端及其子进程会使用代理。
 
 ### 常见代理故障
@@ -288,7 +283,6 @@ git check-ignore -v <文件路径>
 rm -rf src/my_pkg/.git
 ```
 
-> [!DANGER]
 > 删除 `.git` 会永久移除该子仓库的本地版本历史。执行前务必确认路径并做好备份。
 
 ### 2. GitHub 首页没有显示 README
