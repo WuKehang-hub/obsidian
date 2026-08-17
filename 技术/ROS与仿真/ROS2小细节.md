@@ -3,7 +3,7 @@ tags:
   - ROS2
   - Ubuntu
   - Linux
-date: 2025-03-12 01:50:55
+date: 2025-03-12
 ---
 ![[附件/post-ros2-notes-cover.png|720]]
 

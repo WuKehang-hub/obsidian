@@ -2,7 +2,7 @@
 tags:
   - SolidWorks
   - 建模
-date: 2025-03-04 01:50:55
+date: 2025-03-04
 ---
 ![[附件/post-solidworks-notes-cover.png|720]]
 

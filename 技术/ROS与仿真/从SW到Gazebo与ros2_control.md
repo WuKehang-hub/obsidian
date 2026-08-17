@@ -1,9 +1,9 @@
 ---
-tags: 
-- ROS2
-- ros2_control
-- Gazebo
-date: 2025-03-27 01:50:55
+tags:
+  - ROS2
+  - ros2_control
+  - Gazebo
+date: 2025-03-27
 ---
 
 # 写在开头

@@ -1,8 +1,8 @@
 ---
-tags: 
-- Python
-- 编程
-date: 2025-03-04 01:50:55
+tags:
+  - Python
+  - 编程
+date: 2025-03-04
 ---
 ![[附件/post-python-intro-cover.png|720]]
 

@@ -1,8 +1,8 @@
 ---
-tags: 
-- 刷题
-- 算法
-date: 2026-06-15 01:50:55
+tags:
+  - 刷题
+  - 算法
+date: 2026-06-15
 ---
 
 ==此篇为Hot100刷题笔记(Python版)==
@@ -865,6 +865,7 @@ class Solution:
                 window[ord(left_ch) - ord("a")] -= 1
 
             # 窗口达到固定长度后，比较字符频率
+            # 我觉得是为了代码可读性，其实直接写if window == need:是一样的
             if right >= window_size - 1 and window == need:
                 answer.append(right - window_size + 1)
 
@@ -878,3 +879,201 @@ class Solution:
 * **为什么比较频率数组**：异位词不要求字符顺序相同，只要求每种字符出现次数相同。两个长度为 `26` 的频率数组相等，就说明当前窗口是 `p` 的异位词。
 * **起始下标怎么算**：当前右边界是 `right`，窗口长度是 `window_size`，因此起点为 `right - window_size + 1`。
 * **复杂度**：字符串只遍历一次。频率数组长度固定为 `26`，比较成本是常数，因此时间复杂度为 $O(n)$；两个计数数组的空间复杂度为 $O(1)$。
+
+# 子串
+
+## 1. 概念
+
+子串或子数组是原数据中一段**连续**的区间：
+
+- 字符串中的连续片段叫 **子串（substring）**；
+- 数组中的连续片段叫 **子数组（subarray）**；
+- 子序列可以跳过元素，而子串和子数组不可以。
+
+例如，`"abc"` 是 `"abcd"` 的子串，`"ac"` 只能算子序列。
+
+子串问题常用三类方法：
+
+| 方法        | 适用场景             |
+| --------- | ---------------- |
+| 前缀和 + 哈希表 | 统计和满足条件的子数组      |
+| 单调队列      | 快速获取每个窗口的最大值或最小值 |
+| 滑动窗口      | 寻找满足条件的最短或最长连续区间 |
+
+## 2. 常用方法
+
+* **前缀和**
+
+    `prefix[i]` 表示前 `i` 个元素之和，则区间 `[left, right]` 的和为：
+    $$
+    prefix[right + 1] - prefix[left]
+    $$
+
+    ```python
+    prefix = 0
+    for num in nums:
+        prefix += num
+    ```
+
+* **前缀和 + 哈希表**
+
+    哈希表可以记录“某个前缀和出现了几次”。如果当前前缀和为 `prefix`，要找到和为 `k` 的子数组，只需查询 `prefix - k` 是否出现过。
+
+* **单调队列**
+
+    单调队列通常使用 `deque` 保存下标，并让对应数值保持单调。队首始终是当前窗口的最大值或最小值。
+
+    ```python
+    from collections import deque
+
+    queue = deque()
+    queue.append(index)
+    queue.popleft()
+    ```
+
+## 3. 题目
+
+### 题目 1：和为 K 的子数组（LeetCode 560，中等）
+
+==原题==
+
+给定一个整数数组 `nums` 和一个整数 `k`，请统计和等于 `k` 的连续非空子数组的数量。
+
+* **示例 1：** 输入：`nums = [1,1,1]`，`k = 2` -> 输出：`2`。
+* **示例 2：** 输入：`nums = [1,2,3]`，`k = 3` -> 输出：`2`。
+
+==答案==
+
+```python
+class Solution:
+    def subarraySum(self, nums: List[int], k: int) -> int:
+        # 前缀和 0 在遍历前出现过一次
+        prefix_count = {0: 1}
+        prefix = 0
+        answer = 0
+
+        for num in nums:
+            prefix += num
+
+            # prefix - old_prefix = k
+            answer += prefix_count.get(prefix - k, 0)
+
+            prefix_count[prefix] = prefix_count.get(prefix, 0) + 1
+
+        return answer
+```
+
+==解析==
+
+* **核心等式**：若 `当前前缀和 - 之前的前缀和 = k`，两者之间的子数组和就是 `k`。
+* **为什么初始化 `{0: 1}`**：这样从数组开头开始、和恰好为 `k` 的子数组也能被统计。
+* **为什么先查询再记录**：只能使用当前下标之前的前缀和，避免把当前位置与自己错误匹配。
+* **为什么不用普通滑动窗口**：数组中允许出现负数，扩大窗口后总和不一定增大，无法判断应该移动哪一侧。
+* **复杂度**：时间复杂度为 $O(n)$，空间复杂度为 $O(n)$。
+
+---
+
+### 题目 2：滑动窗口最大值（LeetCode 239，困难）
+
+==原题==
+
+给定整数数组 `nums` 和窗口大小 `k`，窗口从数组最左侧移动到最右侧，每次向右移动一格。请返回每个窗口中的最大值。
+
+* **示例：** 输入：`nums = [1,3,-1,-3,5,3,6,7]`，`k = 3` -> 输出：`[3,3,5,5,6,7]`。
+
+==答案==
+
+```python
+from collections import deque
+
+
+class Solution:
+    def maxSlidingWindow(self, nums: List[int], k: int) -> List[int]:
+        queue = deque()  # 保存下标，对应值从大到小
+        answer = []
+
+        for right, num in enumerate(nums):
+            # 移除已经离开窗口的下标
+            if queue and queue[0] <= right - k:
+                queue.popleft()
+
+            # 当前值更大时，队尾元素不可能再成为最大值
+            while queue and nums[queue[-1]] <= num:
+                queue.pop()
+
+            queue.append(right)
+
+            if right >= k - 1:
+                answer.append(nums[queue[0]])
+
+        return answer
+```
+
+==解析==
+
+* **为什么保存下标**：既可以通过 `nums[index]` 比较大小，也能判断元素是否已经离开窗口。
+* **为什么队列单调递减**：比当前元素更小且更早出现的元素，以后不可能成为窗口最大值，可以直接删除。
+* **为什么队首是答案**：队列中的值从大到小排列，队首下标对应当前窗口最大值。
+* **复杂度**：每个下标最多入队、出队一次，时间复杂度为 $O(n)$，队列空间复杂度为 $O(k)$。
+
+---
+
+### 题目 3：最小覆盖子串（LeetCode 76，困难）
+
+==原题==
+
+给定字符串 `s` 和 `t`，返回 `s` 中包含 `t` 全部字符的最短子串。如果不存在，则返回空字符串 `""`。`t` 中的重复字符也必须满足对应次数。
+
+* **示例 1：** 输入：`s = "ADOBECODEBANC"`，`t = "ABC"` -> 输出：`"BANC"`。
+* **示例 2：** 输入：`s = "a"`，`t = "aa"` -> 输出：`""`。
+
+==答案==
+
+```python
+from collections import Counter, defaultdict
+
+
+class Solution:
+    def minWindow(self, s: str, t: str) -> str:
+        need = Counter(t)
+        window = defaultdict(int)
+
+        required = len(need)  # 需要满足的字符种类数
+        formed = 0            # 已满足的字符种类数
+        left = 0
+        best_start = 0
+        best_length = float("inf")
+
+        for right, ch in enumerate(s):
+            window[ch] += 1
+
+            if ch in need and window[ch] == need[ch]:
+                formed += 1
+
+            # 当前窗口已经覆盖 t，尝试从左侧缩小
+            while formed == required:
+                current_length = right - left + 1
+                if current_length < best_length:
+                    best_start = left
+                    best_length = current_length
+
+                left_ch = s[left]
+                if left_ch in need and window[left_ch] == need[left_ch]:
+                    formed -= 1
+
+                window[left_ch] -= 1
+                left += 1
+
+        if best_length == float("inf"):
+            return ""
+
+        return s[best_start:best_start + best_length]
+```
+
+==解析==
+
+* **窗口扩大**：右指针不断加入字符，直到窗口包含 `t` 所需的全部字符和数量。
+* **窗口收缩**：条件满足后移动左指针，寻找更短的合法窗口；一旦某个必要字符数量不足，就停止收缩。
+* **`formed` 的作用**：记录已经满足数量要求的字符种类，避免每次都完整比较两个字典。
+* **为什么先判断再减少**：如果移出的字符数量原本刚好达到要求，移除后该字符就不再满足，需要让 `formed -= 1`。
+* **复杂度**：左右指针都只向右移动，时间复杂度为 $O(|s|+|t|)$，空间复杂度为 $O(|s|+|t|)$；若只考虑有限字符集，也可视为 $O(1)$。

@@ -1,8 +1,8 @@
 ---
-tags: 
-- yaml
-- ROS2
-date: 2025-03-19 01:50:55
+tags:
+  - yaml
+  - ROS2
+date: 2025-03-19
 ---
 ![[附件/post-yaml-notes-cover.jpg|720]]
 

@@ -1,9 +1,9 @@
 ---
-tags: 
-- ROS2
-- Ubuntu
-- Linux
-date: 2025-03-03 01:50:55
+tags:
+  - ROS2
+  - Ubuntu
+  - Linux
+date: 2025-03-03
 ---
 
 无需多言

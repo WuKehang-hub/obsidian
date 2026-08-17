@@ -1,7 +1,7 @@
 ---
-tags: 
-- Latex
-date: 2026-03-13 21:05:55
+tags:
+  - Latex
+date: 2026-03-13
 ---
 ![[附件/post-latex-notes-cover.webp|720]]
 

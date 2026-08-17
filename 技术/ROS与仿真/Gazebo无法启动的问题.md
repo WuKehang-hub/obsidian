@@ -1,9 +1,9 @@
 ---
-tags: 
-- ROS2
-- Ubuntu
-- Gazebo
-date: 2025-03-10 01:50:55
+tags:
+  - ROS2
+  - Ubuntu
+  - Gazebo
+date: 2025-03-10
 ---
 
 ![[附件/post-gazebo-startup-cover.png|720]]
