@@ -25,6 +25,45 @@ int main() {
 //输出Hello world
 ```
 
+`#include <iostream>`的意思是：**在编译当前程序之前，引入 C++ 标准库的输入输出头文件 `iostream`**。
+
+- `#`：表示这是一条**预处理指令**，由预处理器在正式编译前处理。
+- `include`：表示引入一个头文件。
+- `iostream`：是 input/output stream（输入/输出流）的缩写，其中声明了 `std::cin`、`std::cout`、`std::cerr` 等输入输出工具。
+- `< >`：表示优先在编译器配置的**系统/标准库路径**中查找该头文件。
+
+如果没有引入 `iostream`，编译器就不知道 `cout` 和 `cin` 是什么：
+
+```cpp
+#include <iostream>
+
+int main() {
+    std::cout << "Hello";  // 输出
+    int age;
+    std::cin >> age;       // 输入
+    return 0;
+}
+```
+
+> `#include <iostream>` 只负责引入声明，并不会自动省略 `std::`。`using namespace std;` 是另一条语句，它才允许把 `std::cout` 简写为 `cout`。
+
+==C++ `#include` 和 Python `import` 的区别
+
+| 对比项       | C++ `#include`                              | Python `import`       |
+| --------- | ------------------------------------------- | --------------------- |
+| 发生时机      | 正式编译之前的预处理阶段                                | Python 程序运行时          |
+| 核心作用      | 把头文件的内容提供给当前编译单元                            | 查找、加载并执行模块            |
+| 是否会执行对方代码 | 通常是展开头文件中的声明/定义，不等于运行一个脚本                   | 首次导入时会执行模块的顶层代码       |
+| 名称管理      | 引入后通常仍需 `std::cout` 等命名空间                   | 通常通过 `module.name` 访问 |
+| 重复加载      | 头文件需用 include guard 或 `#pragma once` 防止重复展开 | Python 会缓存已导入的模块      |
+
+可以先这样粗略理解：
+
+- C++ `#include <iostream>`：“**编译之前，复制粘贴一大段东西在代码开头。**”
+- Python `import module`：“**运行时加载一个模块，并让我能使用里面的对象。**”
+
+> 补充：现代 C++20 也引入了模块和 `import` 语法，但它与传统的 `#include` 机制不同；入门阶段先掌握头文件即可。
+
 ### 1.2 注释
 
 **作用**：在代码中加一些说明和解释，方便自己或其他程序员程序员阅读代码
