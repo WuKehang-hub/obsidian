@@ -1086,11 +1086,32 @@ class Solution:
 
 * **示例：** 输入：`nums = [1,3,-1,-3,5,3,6,7]`，`k = 3` -> 输出：`[3,3,5,5,6,7]`。
 
+==我的答案==
+```python
+class Solution:
+    def maxSlidingWindow(self, nums: List[int], k: int) -> List[int]:
+        answer = []
+
+        for left in range(len(nums) - k + 1):
+            right = left + k
+            m=max(nums[left:right])
+            answer.append(m)
+
+        return answer
+```
+
+==这样写为什么不好==
+
+* **每次都重新遍历整个窗口**：`max(...)` 需要检查窗口中的 `k` 个元素，时间复杂度为 $O(k)$。一共有约 `n` 个窗口，因此总时间复杂度是 $O(nk)$，当 `n` 和 `k` 很大时容易超时。
+* **切片还会复制数据**：`nums[left:right]` 会新建一个长度为 `k` 的列表，每轮都会产生额外的时间和临时空间开销。
+* **没有利用相邻窗口的重叠部分**：窗口每次只移动一格，前后两个窗口有 `k - 1` 个相同元素，但这种写法每次都从头求最大值。
+
+这个思路能得到正确结果（修复括号后），但效率不够好。下面的单调队列会及时删除不可能再成为最大值的元素，使每个下标最多入队、出队各一次，将总时间复杂度降为 $O(n)$。
+
 ==答案==
 
 ```python
 from collections import deque
-
 
 class Solution:
     def maxSlidingWindow(self, nums: List[int], k: int) -> List[int]:
