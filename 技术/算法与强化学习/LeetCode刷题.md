@@ -998,6 +998,32 @@ class Solution:
 
     哈希表可以记录“某个前缀和出现了几次”。如果当前前缀和为 `prefix`，要找到和为 `k` 的子数组，只需查询 `prefix - k` 是否出现过。
 
+    Python 字典的 `get` 语法为：
+
+    ```python
+    dictionary.get(key, default_value)
+    ```
+
+    它会查询 `key` 对应的值；如果 `key` 不存在，则返回 `default_value`，而不是报 `KeyError`。例如：
+
+    ```python
+    count = {3: 2}
+
+    count.get(3, 0)  # 3 存在，返回 2
+    count.get(5, 0)  # 5 不存在，返回默认值 0
+    ```
+
+    因此，`prefix_count.get(prefix - k, 0)` 表示：查询“前缀和 `prefix - k` 之前出现过几次”；如果从未出现，就按 `0` 次计算。它等价于：
+
+    ```python
+    if prefix - k in prefix_count:
+        answer += prefix_count[prefix - k]
+    else:
+        answer += 0
+    ```
+
+    同理，下面的 `prefix_count.get(prefix, 0) + 1` 表示：取出当前前缀和原来的出现次数（不存在时按 `0` 计），然后加 `1`。
+
 * **单调队列**
 
     单调队列通常使用 `deque` 保存下标，并让对应数值保持单调。队首始终是当前窗口的最大值或最小值。
