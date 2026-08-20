@@ -26,11 +26,11 @@ ros2 pkg create face_description --build-type ament_cmake --license Apache-2.0
 
 接着，你需要在功能包下建立一个名为urdf的文件夹和一个名为meshes的文件夹。并打开你从solidworks得到的文件夹jaw.SLDASM，找到里面的urdf文件夹，将后缀为urdf的那个文件复制粘贴到我们的urdf文件夹下。在新建的meshes文件夹下继续新建名为visual的文件夹，并将jaw.SLDASM下的meshes文件夹中的所有stl文件复制粘贴到我们的meshes/visual文件夹下。到这一步，就可以把jaw.SLDASM文件夹关掉了。
 
-![[附件/post-sw-gazebo-step-01-package-tree.png]]
+![[Assets/sw-to-gazebo/package-tree.png]]
 
 接着，我们需要修改urdf文件。准确来说就是修改所有的stl路径。由于我们的stl文件是全部放到meshes/visual下的，所以需要修改路径的前半部分。Ctrl+F搜索stl文件的路径，改称正确的路径，点击全部替换。修改完成后应如下图所示：
 
-![[附件/post-sw-gazebo-step-02-urdf-paths.png]]
+![[Assets/sw-to-gazebo/urdf-paths.png]]
 
 这一步请注意：**请不要使用绝对路径，请使用相对路径，也就是package://开头的格式**，否则在后续rviz中会出现错误。
 
@@ -42,7 +42,7 @@ ros2 pkg create face_description --build-type ament_cmake --license Apache-2.0
 
 接着你需要新建一个config文件夹。在该文件夹下放置保存好的rviz文件。
 
-![[附件/post-sw-gazebo-step-03-config-folder.png]]
+![[Assets/sw-to-gazebo/config-folder.png]]
 
 接着就可以通过launch文件启动rviz并加载模型了。
 
@@ -118,7 +118,7 @@ ros2 launch face_description display_robot.launch.py
 
 **记得将Fixed Frame修改成base_link。**
 
-![[附件/post-sw-gazebo-step-04-rviz-frame.png]]
+![[Assets/sw-to-gazebo/rviz-frame.png]]
 
 到这一步，就完成了模型的可视化。
 
@@ -126,7 +126,7 @@ ros2 launch face_description display_robot.launch.py
 
 由于后续需要给机器人添加人ros2_control插件，所以我们需要新建一个xacro文件来表示我们的机器人。在urdf文件夹下新建jaw.urdf.xacro和jaw.ros2_control.xacro
 
-![[附件/post-sw-gazebo-step-05-xacro-files.png]]
+![[Assets/sw-to-gazebo/xacro-files.png]]
 
 以下内容仅作参考，具体需要实现什么功能需根据实际情况编写：
 
@@ -181,7 +181,7 @@ jaw.ros2_control.xacro：
 
 新建world文件夹，在下面存放gazebo的world文件：
 
-![[附件/post-sw-gazebo-step-06-world-file.png]]
+![[Assets/sw-to-gazebo/world-file.png]]
 
 接着编写launch文件来启动gazebo并加载模型，在launch文件夹下新建gazebo_sim.launch.py:
 
@@ -329,7 +329,7 @@ ok，接下来就可以启动gazebo_sim.launch.py文件了，不出意外你将�
 
 在config文件夹下新建jaw_ros2_controller.yaml文件:
 
-![[附件/post-sw-gazebo-step-07-controller-yaml.png]]
+![[Assets/sw-to-gazebo/controller-yaml.png]]
 
 编写yaml文件内容：
 
@@ -474,7 +474,7 @@ ros2 topic list -v | grep jaw_effort_controller
 
 你就可以看到jaw_effort_controller相关话题了。
 
-![[附件/post-sw-gazebo-step-08-controller-topics.png]]
+![[Assets/sw-to-gazebo/controller-topics.png]]
 
 接下来就可以发布topic了。
 

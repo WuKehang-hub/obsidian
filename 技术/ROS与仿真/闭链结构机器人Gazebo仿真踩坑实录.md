@@ -24,7 +24,7 @@ date: 2025-03-04
 
 找了个视频教程，教程中使用的是Moviet2，过程极其顺利，舵机很快就在Moviet2中可视化出来，并可以通过拉条控制旋转
 
-![[附件/post-closed-chain-gazebo-robot-demo.png]]
+![[Assets/closed-chain-gazebo/robot-demo.png]]
 
 信心大增，开始正式导入表情机器人模型
 
@@ -82,7 +82,7 @@ git clone https://github.com/olmerg/lesson_urdf.git
 
 表情机器人里很多结构都是闭链结构，但是urdf不能实现这种结构，urdf只能a→b→c→d，但不能a→b→c→d→a，我学urdf的时候也没人告诉我，以至于当我在ros2里拖动拉条的时候才发现不对
 
-![[附件/post-closed-chain-gazebo-urdf-notes.png]]
+![[Assets/closed-chain-gazebo/urdf-notes.png]]
 
 想到的解决方法：
 

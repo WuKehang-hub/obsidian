@@ -6,7 +6,7 @@ tags:
 date: 2025-03-19
 ---
 
-![[附件/post-yaml-notes-cover.jpg|720]]
+![[Assets/yaml-syntax/cover.jpg|720]]
 
 # 什么是YAML
 

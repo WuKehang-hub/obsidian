@@ -5,7 +5,7 @@ tags:
 date: 2025-03-04
 ---
 
-![[附件/post-python-intro-cover.png|720]]
+![[Assets/python-intro/cover.png|720]]
 
 # 写在开头
 

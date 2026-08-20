@@ -393,26 +393,6 @@ ENVS_DIR = os.path.join(ROOT_DIR, 'legged_gym', 'envs')
 2. **读取数据阶段（下发任务）**
    当运行 `train.py` 开始训练时，主程序会调用 `task_registry.make_env(...)`，要求管家根据名字去字典里找对应的图纸。
 
-# Python 环境与包管理
-
-## pip安装与conda安装
-
-安装一个包一般两种方式：pip安装和conda安装
-
-pip是 Python 环境中默认自带的包管理工具，它直接与 PyPI（Python Package Index）仓库连接。主要用于安装和管理 Python 编写的软件包。但是对于包含 C/C++ 扩展的包，pip 有时需要本地系统预装编译器和底层库才能成功安装。
-
-conda 是一个开源的软件包管理系统和环境管理系统。能够创建完全独立的虚拟环境，每个环境可以拥有不同的 Python 版本。conda 安装的是预编译好的二进制文件，所以它不仅能管理 Python 包，还能管理非 Python 依赖（如 CUDA 驱动、C++ 编译器、MKL 库等）。拥有强大的依赖解析引擎，能自动检查各个包之间的版本兼容性。
-
-在实际开发（如安装 rsl_rl 或 legged_gym）时，通常遵循以下原则：优先使用 conda 安装底层重型库（如 pytorch、cuda、cudatoolkit），因为 conda 能处理复杂的系统级依赖。使用 pip 安装那些 conda 仓库里没有的、或者开发者提供的源码包（使用 pip install -e .）。
-
-## Anaconda与Miniconda
-
-Anaconda：全家桶方案。包含 Python 解释器，Conda（环境管理器，包管理器），一个base环境，还包含了数据科学、机器学习相关的几百个常用工具包（NumPy, Pandas, Matplotlib 等）。缺点是非常臃肿，安装包好几个 GB，会占用大量电脑空间。
-
-Miniconda：毛坯房方案。它是 Anaconda 的精简版。它只包含了最核心的Python解释器 和 Conda。它的安装包通常只有几十MB。你需要什么额外的库，自己按需安装即可。
-
-一般情况下：除了新手，直接用Miniconda。
-
 # VS Code 找不到代码引用或高亮
 
 ## 问题现象

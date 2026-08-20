@@ -6,7 +6,7 @@ date: 2026-05-24
 
 # Ubuntu安装Claude Code并介入DeepSeek
 
-![[附件/post-claude-code-cover.png|720]]
+![[Assets/claude-code-setup/cover.png|720]]
 
 ## 1. 准备环境（安装 Node.js）
 

@@ -6,7 +6,7 @@ tags:
 date: 2025-03-10
 ---
 
-![[附件/post-gazebo-startup-cover.png|720]]
+![[Assets/gazebo-startup/cover.png|720]]
 
 # 问题描述
 

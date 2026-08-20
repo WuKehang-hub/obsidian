@@ -4,7 +4,7 @@ tags:
 date: 2026-02-25
 ---
 
-![[附件/post-git-notes-cover.png|720]]
+![[Assets/git-notes/cover.png|720]]
 
 Git 是一个**分布式版本控制系统**，用于记录文件变化、协作开发以及在需要时恢复历史版本。
 
@@ -300,7 +300,7 @@ rm -rf src/my_pkg/.git
 GitHub README 应使用标准 Markdown 图片语法：
 
 ```markdown
-![路径规划总览](附件/Fig5_3_路径规划总览.png)
+![路径规划总览](Assets/path-planning-overview.png)
 ```
 
 路径必须相对于 `README.md`，并统一使用正斜杠 `/`。
@@ -308,7 +308,7 @@ GitHub README 应使用标准 Markdown 图片语法：
 以下是 Obsidian 的 Wiki 嵌入语法，GitHub 通常无法按图片方式解析：
 
 ```markdown
-![[附件/Fig5_3_路径规划总览.png]]
+![[Assets/path-planning-overview.png]]
 ```
 
 如果文件名含空格、特殊字符或大小写不一致，也可能造成图片在 GitHub 上无法显示。为仓库图片使用简短的英文文件名通常更稳妥。

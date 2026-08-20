@@ -250,12 +250,12 @@ python -m pip list
 
 pip 主要管理 Python 软件包，而 Conda 除了管理 Python 包，还能创建独立环境，并管理部分 CUDA、C/C++ 库等非 Python 依赖。
 
-| 对比项 | pip | Conda |
-| --- | --- | --- |
-| 主要用途 | 安装 Python 软件包 | 管理环境和软件包 |
-| 常用软件源 | PyPI | Conda 的 channels |
+| 对比项            | pip               | Conda                 |
+| -------------- | ----------------- | --------------------- |
+| 主要用途           | 安装 Python 软件包     | 管理环境和软件包              |
+| 常用软件源          | PyPI              | Conda 的 channels      |
 | 是否管理 Python 版本 | 不负责创建独立 Python 环境 | 可以为每个环境安装不同 Python 版本 |
-| 非 Python 依赖 | 处理能力较有限 | 可以管理部分系统级依赖 |
+| 非 Python 依赖    | 处理能力较有限           | 可以管理部分系统级依赖           |
 
 Conda 环境中也可以使用 pip。pip 会把包安装到当前激活环境的 Python 中，所以安装前必须先确认已经激活正确的 Conda 环境。
 

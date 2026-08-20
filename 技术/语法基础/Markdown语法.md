@@ -132,13 +132,13 @@ if __name__ == "__main__":
 本地图片推荐使用 Wiki 嵌入语法：
 
 ```markdown
-![[附件/post-ros2-notes-cover.png]]
-![[附件/post-ros2-notes-cover.png|480]]
+![[Assets/ros2-tips/cover.png]]
+![[Assets/ros2-tips/cover.png|480]]
 ```
 
 下面是设置宽度后的实际显示效果：
 
-![[附件/post-ros2-notes-cover.png|480]]
+![[Assets/ros2-tips/cover.png|480]]
 
 ### 网页图片
 

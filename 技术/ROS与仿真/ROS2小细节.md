@@ -6,7 +6,7 @@ tags:
 date: 2025-03-12
 ---
 
-![[附件/post-ros2-notes-cover.png|720]]
+![[Assets/ros2-tips/cover.png|720]]
 
 这篇笔记记录一些在学习和使用 ROS 2 时遇到的基础细节。
 
