@@ -25,7 +25,9 @@ int main() {
 //输出Hello world
 ```
 
-`#include <iostream>`的意思是：**在编译当前程序之前，引入 C++ 标准库的输入输出头文件 `iostream`**。
+==`#include <iostream>`的作用==
+
+**在编译当前程序之前，引入 C++ 标准库的输入输出头文件 `iostream`**。
 
 - `#`：表示这是一条**预处理指令**，由预处理器在正式编译前处理。
 - `include`：表示引入一个头文件。
@@ -46,6 +48,24 @@ int main() {
 ```
 
 > `#include <iostream>` 只负责引入声明，并不会自动省略 `std::`。`using namespace std;` 是另一条语句，它才允许把 `std::cout` 简写为 `cout`。
+
+==`using namespace std;` 的作用==
+
+C++ 标准库中的名称大多定义在 `std` 命名空间中。`using namespace std;` 表示：**在当前作用域内使用 `std` 命名空间中的名称时，可以省略 `std::` 前缀**。
+
+```cpp
+// 未使用 using namespace std;
+std::cout << "Hello" << std::endl;
+
+// 使用 using namespace std; 后
+cout << "Hello" << endl;
+```
+
+- `std`：C++ 标准库使用的命名空间。
+- `::`：作用域解析运算符，`std::cout` 表示使用 `std` 中的 `cout`。
+- `using namespace std;` 不会引入头文件，因此使用 `cout` 前仍需要 `#include <iostream>`。
+
+> 注意：这种写法适合入门练习和小型程序。在大型项目或头文件中，它可能导致同名标识符冲突，通常建议明确写出 `std::cout`、`std::string` 等，或只引入需要的名称，例如 `using std::cout;`。
 
 ==C++ `#include` 和 Python `import` 的区别
 
@@ -1217,8 +1237,6 @@ int main()
 
 **语法：**` for(起始表达式;条件表达式;末尾循环体) { 循环语句; }`
 
-
-
 **示例：**
 
 ```C++
@@ -1234,18 +1252,6 @@ int main() {
 	return 0;
 }
 ```
-
-
-
-
-
-
-
-**详解：**
-
-![1541673704101](assets/1541673704101.png)
-
-
 
 > 注意：for循环中的表达式，要用分号进行分隔
 
