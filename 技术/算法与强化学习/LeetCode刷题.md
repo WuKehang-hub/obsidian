@@ -978,81 +978,179 @@ class Solution:
 
 ## 2. 常用方法
 
-* **前缀和**
+### 前缀和
 
-    `prefix[i]` 表示前 `i` 个元素之和，则区间 `[left, right]` 的和为：
+`prefix[i]` 表示前 `i` 个元素之和，则区间 `[left, right]` 的和为：
 
-    $$
+$$
 
-    prefix[right + 1] - prefix[left]
+prefix[right + 1] - prefix[left]
 
-    $$
+$$
 
-    ```python
-    prefix = 0
-    for num in nums:
-        prefix += num
-    ```
+```python
+prefix = 0
+for num in nums:
+    prefix += num
+```
 
-* **前缀和 + 哈希表**
+### 前缀和 + 哈希表
 
-    哈希表可以记录“某个前缀和出现了几次”。如果当前前缀和为 `prefix`，要找到和为 `k` 的子数组，只需查询 `prefix - k` 是否出现过。
+哈希表可以记录“某个前缀和出现了几次”。如果当前前缀和为 `prefix`，要找到和为 `k` 的子数组，只需查询 `prefix - k` 是否出现过。
 
-    Python 字典的 `get` 语法为：
+Python 字典的 `get` 语法为：
 
-    ```python
-    dictionary.get(key, default_value)
-    ```
+```python
+dictionary.get(key, default_value)
+```
 
-    它会查询 `key` 对应的值；如果 `key` 不存在，则返回 `default_value`，而不是报 `KeyError`。例如：
+它会查询 `key` 对应的值；如果 `key` 不存在，则返回 `default_value`，而不是报 `KeyError`。例如：
 
-    ```python
-    count = {3: 2}
+```python
+count = {3: 2}
 
-    count.get(3, 0)  # 3 存在，返回 2
-    count.get(5, 0)  # 5 不存在，返回默认值 0
-    ```
+count.get(3, 0)  # 3 存在，返回 2
+count.get(5, 0)  # 5 不存在，返回默认值 0
+```
 
-    因此，`prefix_count.get(prefix - k, 0)` 表示：查询“前缀和 `prefix - k` 之前出现过几次”；如果从未出现，就按 `0` 次计算。它等价于：
+因此，`prefix_count.get(prefix - k, 0)` 表示：查询“前缀和 `prefix - k` 之前出现过几次”；如果从未出现，就按 `0` 次计算。它等价于：
 
-    ```python
-    if prefix - k in prefix_count:
-        answer += prefix_count[prefix - k]
-    else:
-        answer += 0
-    ```
+```python
+if prefix - k in prefix_count:
+    answer += prefix_count[prefix - k]
+else:
+    answer += 0
+```
 
-    同理，下面的 `prefix_count.get(prefix, 0) + 1` 表示：取出当前前缀和原来的出现次数（不存在时按 `0` 计），然后加 `1`。
+同理，下面的 `prefix_count.get(prefix, 0) + 1` 表示：取出当前前缀和原来的出现次数（不存在时按 `0` 计），然后加 `1`。
 
-* **单调队列**
+### 先认识 `deque`（双端队列）
 
-    单调队列通常使用 `deque` 保存下标，并让对应数值保持单调。队首始终是当前窗口的最大值或最小值。
+`deque` 来自 Python 标准库 `collections`，全称是 **double-ended queue**。它和列表类似，但可以高效地在**队首和队尾**添加或删除元素。
 
-    ```python
-    from collections import deque
+```python
+from collections import deque
 
-    queue = deque()
-    queue.append(index)
-    queue.popleft()
-    ```
+queue = deque()          # 创建空队列：deque([])
+queue.append(10)         # 右边加入 10：deque([10])
+queue.append(20)         # 右边加入 20：deque([10, 20])
+queue.appendleft(5)      # 左边加入 5：deque([5, 10, 20])
 
-* **堆（优先队列）**
+right = queue.pop()      # 删除并返回右端元素 20
+left = queue.popleft()   # 删除并返回左端元素 5
+first = queue[0]         # 查看队首 10，但不删除
+last = queue[-1]         # 查看队尾 10，但不删除
+```
 
-    堆是一种能快速取出“优先级最高元素”的数据结构。在小根堆中，堆顶始终是最小元素；在大根堆中，堆顶始终是最大元素。
+| 操作          | 作用        | 单调队列中常见用途    |
+| ----------- | --------- | ------------ |
+| `deque()`   | 创建双端队列    | 初始化队列        |
+| `append(x)` | 从队尾加入 `x` | 新下标入队        |
+| `popleft()` | 删除并返回队首   | 删除已经离开窗口的下标  |
+| `pop()`     | 删除并返回队尾   | 删除不可能成为答案的下标 |
+| `queue[0]`  | 查看队首      | 读取当前最大值对应的下标 |
+| `queue[-1]` | 查看队尾      | 与新元素比较大小     |
 
-    Python 的 `heapq` 默认实现**小根堆**。如果想当作大根堆使用，可以将数值取负后放入堆中：原来越大的数，取负后反而越小，因此会位于小根堆的堆顶。
+> 普通 `list.pop(0)` 删除开头元素需要移动后面的所有元素，是 $O(n)$；`deque.popleft()` 是 $O(1)$，因此需要频繁操作队首时应使用 `deque`。
 
-    ```python
-    import heapq
+### 再理解单调队列
 
-    heap = []
-    heapq.heappush(heap, value)  # 插入元素，O(log n)
-    top = heap[0]                # 查看堆顶，O(1)
-    value = heapq.heappop(heap)  # 删除并返回堆顶，O(log n)
-    heapq.heapify(data)          # 将列表原地转换为堆，O(n)
-    ```
+“单调队列”不是 Python 提供的另一个库，而是我们用 `deque` **自己维护出来的一种状态**。以求窗口最大值为例，队列保存数组下标，并保证这些下标对应的值从队首到队尾单调递减。
 
-    堆只保证堆顶元素的优先级最高，**不保证整个列表完全有序**。在滑动窗口问题中，通常将 `(值, 下标)` 一起存入堆，以便判断堆顶元素是否已经离开窗口。
+维护时只做三件事：
+
+1. 用 `popleft()` 删除队首已经离开窗口的下标；
+2. 新元素进入前，用 `pop()` 删除队尾所有小于等于它的元素；
+3. 用 `append()` 把新元素的下标加入队尾。
+
+队首 `queue[0]` 对应的值自然就是当前窗口最大值。
+
+**这里并没有调用排序函数。**“单调”不是先把整个窗口排序，而是在每个新元素进入时，通过不断删除队尾元素，始终维持“队首到队尾对应值从大到小”这一规则。
+
+假设加入新元素前，队列对应的值已经是：
+
+```text
+队首 [8, 5, 3] 队尾
+```
+
+现在新元素 `6` 要进入：
+
+1. 比较队尾 `3` 和 `6`，因为 `3 <= 6`，用 `pop()` 删除 `3`；
+2. 再比较新队尾 `5` 和 `6`，因为 `5 <= 6`，继续删除 `5`；
+3. 此时队尾是 `8`，因为 `8 > 6`，停止删除；
+4. 用 `append()` 把 `6` 放到队尾。
+
+```text
+原队列：[8, 5, 3]
+删除 3：[8, 5]
+删除 5：[8]
+加入 6：[8, 6]
+```
+
+加入后仍然从大到小，所以不需要额外排序。第一个元素 `8` 最大，因此队首就是当前窗口最大值。
+
+**为什么可以永久删除 `3` 和 `5`？** 因为新来的 `6` 同时满足：
+
+- 数值比它们大；
+- 下标比它们新，会比它们更晚离开窗口。
+
+只要 `6` 还在窗口中，`3` 和 `5` 就不可能成为最大值；等 `6` 离开时，它们早已先离开，因此永远不会再有用。
+
+还要注意，队列中通常保存的是**下标**，上面的 `[8, 6]` 只是为了直观展示。实际比较写成：
+
+```python
+while queue and nums[queue[-1]] <= num:
+    queue.pop()
+```
+
+`queue[-1]` 是队尾下标，`nums[queue[-1]]` 才是该下标对应的数值。最开始队列为空，可以认为“从大到小”的规则天然成立；之后每轮都按上述步骤维护，所以它一直保持单调，而不是在某一时刻统一排序。
+
+### 先认识 `heapq`（堆）
+`heapq` 是 Python 标准库中的堆操作模块。它**没有单独的堆类型**，而是把普通 `list` 按照堆的规则进行维护。Python 的 `heapq` 默认是**小根堆**，也就是最小元素始终位于 `heap[0]`。
+
+```python
+import heapq
+
+heap = []
+heapq.heappush(heap, 5)   # 插入 5
+heapq.heappush(heap, 2)   # 插入 2
+heapq.heappush(heap, 8)   # 插入 8
+
+top = heap[0]                  # 查看最小值 2，不删除
+smallest = heapq.heappop(heap) # 删除并返回最小值 2
+```
+
+| 操作                           | 作用         | 时间复杂度       |
+| ---------------------------- | ---------- | ----------- |
+| `heapq.heappush(heap, x)`    | 将 `x` 放入堆  | $O(\log n)$ |
+| `heapq.heappop(heap)`        | 删除并返回堆顶最小值 | $O(\log n)$ |
+| `heap[0]`                    | 查看堆顶，但不删除  | $O(1)$      |
+| `heapq.heapify(data)`        | 将现有列表原地变成堆 | $O(n)$      |
+| `heapq.heappushpop(heap, x)` | 先插入，再弹出最小值 | $O(\log n)$ |
+
+堆只保证 `heap[0]` 最小，**不保证列表从小到大排列**，所以不要把打印出的堆列表当成排序结果。
+
+### 用小根堆模拟大根堆
+
+求最大值时，可以把每个数取负后存入小根堆。原数越大，负数越小，就越靠近堆顶：
+
+```python
+heap = []
+heapq.heappush(heap, -10)
+heapq.heappush(heap, -30)
+heapq.heappush(heap, -20)
+
+maximum = -heap[0]  # 30；取出时再恢复符号
+```
+
+滑动窗口中还要知道元素是否过期，因此通常保存 `(-数值, 下标)`。Python 比较元组时先比较第一项；第一项相同时再比较第二项。
+
+```python
+heapq.heappush(heap, (-nums[i], i))
+
+value = -heap[0][0]  # 堆顶元素的原值
+index = heap[0][1]   # 堆顶元素的下标
+```
 
 ## 3. 题目
 
@@ -1133,16 +1231,17 @@ class Solution:
 ```python
 import heapq
 
-
 class Solution:
     def maxSlidingWindow(self, nums: List[int], k: int) -> List[int]:
         n = len(nums)
 
         # Python 默认是小根堆，所以存入数值的相反数
         # 元素格式：(-数值, 下标)
-        queue = [(-nums[i], i) for i in range(k)]
-        heapq.heapify(queue)
-
+        queue = []
+        for i in range(k):
+            queue.append((-nums[i], i))
+        heapq.heapify(queue) # Python 中元组进行比较/排序时，默认从第一个元素开始比较
+ 
         answer = [-queue[0][0]]
 
         for i in range(k, n):
@@ -1156,6 +1255,35 @@ class Solution:
 
         return answer
 ```
+
+以第一轮初始化为例，`k = 3`，前三个元素是 `[1, 3, -1]`：
+
+```python
+queue = []
+for i in range(k):
+    queue.append((-nums[i], i))
+
+# 循环结束后得到 [(-1, 0), (-3, 1), (1, 2)]
+
+heapq.heapify(queue)
+# 按小根堆规则调整后，堆顶是 (-3, 1)
+# -queue[0][0] = -(-3) = 3，所以第一个窗口最大值是 3
+```
+
+上面的普通 `for` 循环与下面的列表推导式完全等价：
+
+```python
+queue = [(-nums[i], i) for i in range(k)]
+```
+
+列表推导式只是把“创建空列表、遍历、追加元素”压缩到一行，并没有改变算法。这里为了便于初学者观察 `(-nums[i], i)` 是如何逐个加入的，正式解答使用更直观的普通 `for` 循环。
+
+窗口向右移动、`i = 3` 时，新元素 `nums[3] = -3`：
+
+1. `heappush(queue, (3, 3))` 把新元素及下标放入堆；
+2. 当前窗口下标范围是 `[1, 3]`，所以小于等于 `i - k = 0` 的下标都已过期；
+3. `while` 只在过期元素来到堆顶时调用 `heappop()`；
+4. 最后从 `queue[0]` 读取当前窗口最大值。
 
 * `queue[0]` 是堆顶，`-queue[0][0]` 就是当前窗口的最大值。
 * 元素必须同时保存下标，因为需要用 `queue[0][1] <= i - k` 判断堆顶是否已经离开窗口。
@@ -1194,6 +1322,24 @@ class Solution:
 
         return answer
 ```
+
+先用较短的 `nums = [1, 3, -1, -3]`、`k = 3` 走一遍。队列里保存的是**下标**：
+
+| `right` | 当前值 `num` | 操作 | 队列中的下标 | 对应数值 | 是否输出 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 0 | 1 | 下标 0 入队 | `[0]` | `[1]` | 窗口未满 |
+| 1 | 3 | 3 比队尾的 1 大，弹出 0；下标 1 入队 | `[1]` | `[3]` | 窗口未满 |
+| 2 | -1 | -1 比 3 小，直接入队 | `[1, 2]` | `[3, -1]` | 输出 3 |
+| 3 | -3 | 队首 1 仍在窗口；下标 3 入队 | `[1, 2, 3]` | `[3, -1, -3]` | 输出 3 |
+
+这段代码里的两个删除方向不要混淆：
+
+```python
+queue.popleft()  # 从左边删：处理“下标过期”
+queue.pop()      # 从右边删：处理“数值不可能再成为最大值”
+```
+
+例如新值 `5` 到来时，队尾的 `-3`、`-1`、`3` 都比 `5` 小，而且它们还比 `5` 更早离开窗口，所以以后不可能战胜 `5`，可以全部删除。
 
 ==解析==
 
@@ -1263,3 +1409,302 @@ class Solution:
 * **`formed` 的作用**：记录已经满足数量要求的字符种类，避免每次都完整比较两个字典。
 * **为什么先判断再减少**：如果移出的字符数量原本刚好达到要求，移除后该字符就不再满足，需要让 `formed -= 1`。
 * **复杂度**：左右指针都只向右移动，时间复杂度为 $O(|s|+|t|)$，空间复杂度为 $O(|s|+|t|)$；若只考虑有限字符集，也可视为 $O(1)$。
+
+# 普通数组
+
+## 1. 概念
+
+普通数组题通常没有固定的算法模板，而是考查如何利用数组的**连续存储、下标访问和遍历顺序**维护状态。解题关键不在于记住某一种数据结构，而在于判断：当前答案是否只依赖已经遍历过的部分，以及能否通过原地修改复用输入数组的空间。
+
+数组支持通过下标在 $O(1)$ 时间内访问元素，但在中间插入或删除元素通常需要移动后续内容，时间复杂度为 $O(n)$。因此，算法题中更常见的操作是遍历、交换、覆盖和区间反转。
+
+这一类题常见的思考方向如下：
+
+| 题目特征 | 常用方法 | 核心问题 |
+| :--- | :--- | :--- |
+| 求连续区间的最优值 | 动态规划、贪心 | 前面的结果对当前位置还有没有正贡献 |
+| 合并有重叠的区间 | 排序后扫描 | 当前区间能否接到上一个区间后面 |
+| 原地移动数组元素 | 数组反转、循环替换 | 如何避免额外创建同规模数组 |
+| 每个位置都要使用其余元素 | 前缀积与后缀积 | 如何避免重复计算和使用除法 |
+| 元素值可以映射到下标 | 原地哈希 | 能否用数组本身记录某个值是否出现 |
+
+> 普通数组题看似技巧分散，但很多解法都在维护一个明确的不变量。写代码前，先说清楚“遍历到当前位置时，已经处理好的部分表示什么”，往往比直接套模板更可靠。
+
+## 2. 常用方法
+
+### 动态规划与滚动变量
+
+如果当前位置的状态只依赖前一个位置，就不需要保存完整的动态规划数组，可以只保留一个变量。
+
+```python
+current = nums[0]
+answer = nums[0]
+
+for num in nums[1:]:
+    current = max(num, current + num)
+    answer = max(answer, current)
+```
+
+其中，`current` 表示“必须以当前位置结尾”的最优解，`answer` 表示遍历到目前为止的全局最优解。二者含义不同，不能只返回 `current`。
+
+### 排序后合并区间
+
+区间问题若直接两两比较，通常需要 $O(n^2)$。先按左端点排序后，只需要判断当前区间与结果中的最后一个区间是否重叠。
+
+```python
+intervals.sort(key=lambda interval: interval[0])
+merged = []
+
+for left, right in intervals:
+    if not merged or left > merged[-1][1]:
+        merged.append([left, right])
+    else:
+        merged[-1][1] = max(merged[-1][1], right)
+```
+
+排序把原本无序的关系变成了从左到右的顺序关系。因为后续区间的左端点不会更小，所以当前区间只需要和最后一个已合并区间比较。
+
+### 原地反转
+
+反转闭区间 `[left, right]` 的常用写法如下：
+
+```python
+while left < right:
+    nums[left], nums[right] = nums[right], nums[left]
+    left += 1
+    right -= 1
+```
+
+反转可以改变元素的整体顺序，同时只使用常数额外空间。数组轮转问题中，三次反转可以代替额外数组。
+
+### 前缀信息与后缀信息
+
+当每个位置的答案由“左边所有元素”和“右边所有元素”共同决定时，可以先记录前缀信息，再从右向左维护后缀信息。
+
+```python
+answer = [1] * len(nums)
+
+prefix = 1
+for index in range(len(nums)):
+    answer[index] = prefix
+    prefix *= nums[index]
+
+suffix = 1
+for index in range(len(nums) - 1, -1, -1):
+    answer[index] *= suffix
+    suffix *= nums[index]
+```
+
+这种方法避免了对每个位置重新扫描整个数组，常能把 $O(n^2)$ 降为 $O(n)$。
+
+### 用下标充当哈希位置
+
+如果题目关心的值域与数组长度有关，例如只关心 `1` 到 `n` 是否出现，就可以把数值 `x` 放到下标 `x - 1` 的位置。
+
+```python
+while 1 <= nums[index] <= n and nums[nums[index] - 1] != nums[index]:
+    target = nums[index] - 1
+    nums[index], nums[target] = nums[target], nums[index]
+```
+
+循环结束后，理想状态是 `nums[index] == index + 1`。这种方法常被称为原地哈希，但必须防止重复元素导致无限交换。
+
+## 3. 题目
+
+### 题目 1：最大子数组和（LeetCode 53，中等）
+
+==原题==
+
+给定一个整数数组 `nums`，请找出一个具有最大和的连续子数组，并返回其最大和。
+
+* **示例 1：** 输入：`nums = [-2,1,-3,4,-1,2,1,-5,4]` -> 输出：`6`，对应子数组 `[4,-1,2,1]`。
+* **示例 2：** 输入：`nums = [1]` -> 输出：`1`。
+
+==答案==
+
+```python
+class Solution:
+    def maxSubArray(self, nums: List[int]) -> int:
+        # current 表示必须以当前位置结尾的最大子数组和
+        current = nums[0]
+        answer = nums[0]
+
+        for num in nums[1:]:
+            current = max(num, current + num)
+            answer = max(answer, current)
+
+        return answer
+```
+
+==解析==
+
+* **状态定义**：`current` 不是前面任意子数组的最大和，而是必须以当前元素结尾的最大子数组和。
+* **状态转移**：到达 `num` 时只有两种选择：从 `num` 重新开始，或把 `num` 接到前一个连续子数组后面，因此有 `max(num, current + num)`。
+* **为什么可以丢弃负贡献**：如果前一个 `current < 0`，把它接到当前元素前只会让总和更小，不如从当前元素重新开始。
+* **为什么不能初始化为 `0`**：数组可能全部为负数。初始化为 `0` 会错误地把空子数组当成答案。
+* **复杂度**：时间复杂度为 $O(n)$，只使用两个变量，空间复杂度为 $O(1)$。
+
+---
+
+### 题目 2：合并区间（LeetCode 56，中等）
+
+==原题==
+
+给定若干区间 `intervals`，其中 `intervals[i] = [start_i, end_i]`。请合并所有重叠区间，并返回互不重叠且覆盖原有全部区间的结果。
+
+* **示例 1：** 输入：`intervals = [[1,3],[2,6],[8,10],[15,18]]` -> 输出：`[[1,6],[8,10],[15,18]]`。
+* **示例 2：** 输入：`intervals = [[1,4],[4,5]]` -> 输出：`[[1,5]]`。
+
+==答案==
+
+```python
+class Solution:
+    def merge(self, intervals: List[List[int]]) -> List[List[int]]:
+        intervals.sort(key=lambda interval: interval[0])
+        merged = []
+
+        for left, right in intervals:
+            # 没有结果，或当前区间与最后一个区间完全分离
+            if not merged or left > merged[-1][1]:
+                merged.append([left, right])
+            else:
+                # 有重叠时只需要扩展右端点
+                merged[-1][1] = max(merged[-1][1], right)
+
+        return merged
+```
+
+==解析==
+
+* **为什么先排序**：按左端点排序后，当前区间不可能与更早的区间重叠，却跳过结果中的最后一个区间，因此只需比较 `merged[-1]`。
+* **重叠条件**：如果 `left <= merged[-1][1]`，两个闭区间相交或相接，应当合并。
+* **为什么右端点取最大值**：当前区间可能被上一个区间完全包含，不能直接把右端点赋值为 `right`。
+* **结果为什么存列表**：题目要求返回 `List[List[int]]`，所以加入结果时使用 `[left, right]`，而不是元组。
+* **复杂度**：排序需要 $O(n \log n)$，扫描需要 $O(n)$，总时间复杂度为 $O(n \log n)$；结果数组所需空间为 $O(n)$，若不计返回值，额外空间取决于排序实现。
+
+---
+
+### 题目 3：轮转数组（LeetCode 189，中等）
+
+==原题==
+
+给定整数数组 `nums`，将数组中的元素向右轮转 `k` 个位置。要求原地修改数组。
+
+* **示例 1：** 输入：`nums = [1,2,3,4,5,6,7]`，`k = 3` -> 修改后：`[5,6,7,1,2,3,4]`。
+* **示例 2：** 输入：`nums = [-1,-100,3,99]`，`k = 2` -> 修改后：`[3,99,-1,-100]`。
+
+==答案==
+
+```python
+class Solution:
+    def rotate(self, nums: List[int], k: int) -> None:
+        n = len(nums)
+        k %= n
+
+        def reverse(left: int, right: int) -> None:
+            while left < right:
+                nums[left], nums[right] = nums[right], nums[left]
+                left += 1
+                right -= 1
+
+        reverse(0, n - 1)
+        reverse(0, k - 1)
+        reverse(k, n - 1)
+```
+
+==解析==
+
+* **为什么要 `k %= n`**：轮转 `n` 次会回到原数组。取模还能保证 `k` 不超过数组长度。
+* **三次反转的过程**：以 `[1,2,3,4,5,6,7]` 为例，整体反转得到 `[7,6,5,4,3,2,1]`；反转前 `k` 个得到 `[5,6,7,4,3,2,1]`；再反转剩余部分得到 `[5,6,7,1,2,3,4]`。
+* **为什么 `k = 0` 也正确**：此时 `reverse(0, -1)` 不会进入循环，后一次整体反转会抵消第一次整体反转。
+* **原地要求**：不能使用 `nums[:] = nums[-k:] + nums[:-k]` 作为常数空间解法，因为右侧会创建新的列表。
+* **复杂度**：每个元素只参与常数次交换，时间复杂度为 $O(n)$，空间复杂度为 $O(1)$。
+
+---
+
+### 题目 4：除自身以外数组的乘积（LeetCode 238，中等）
+
+==原题==
+
+给定整数数组 `nums`，返回数组 `answer`，其中 `answer[i]` 等于 `nums` 中除 `nums[i]` 之外其余所有元素的乘积。不能使用除法，并要求在线性时间内完成。
+
+* **示例 1：** 输入：`nums = [1,2,3,4]` -> 输出：`[24,12,8,6]`。
+* **示例 2：** 输入：`nums = [-1,1,0,-3,3]` -> 输出：`[0,0,9,0,0]`。
+
+==答案==
+
+```python
+class Solution:
+    def productExceptSelf(self, nums: List[int]) -> List[int]:
+        n = len(nums)
+        answer = [1] * n
+
+        # answer[i] 先保存 nums[i] 左侧所有元素的乘积
+        prefix = 1
+        for index in range(n):
+            answer[index] = prefix
+            prefix *= nums[index]
+
+        # 再乘上 nums[i] 右侧所有元素的乘积
+        suffix = 1
+        for index in range(n - 1, -1, -1):
+            answer[index] *= suffix
+            suffix *= nums[index]
+
+        return answer
+```
+
+==解析==
+
+* **拆分答案**：`answer[i] = nums[i] 左侧乘积 × nums[i] 右侧乘积`。
+* **第一次遍历**：先把当前 `prefix` 写入答案，再乘 `nums[index]`，这样前缀积中不会包含当前元素。
+* **第二次遍历**：从右向左用 `suffix` 维护右侧乘积，同样先更新答案，再把当前元素乘入 `suffix`。
+* **为什么能处理 `0`**：算法没有求总乘积，也没有做除法。零会自然地进入相应位置的前缀积或后缀积。
+* **空间复杂度如何计算**：输出数组不计入额外空间时，只使用 `prefix` 和 `suffix` 两个变量，所以额外空间复杂度为 $O(1)$；时间复杂度为 $O(n)$。
+
+---
+
+### 题目 5：缺失的第一个正数（LeetCode 41，困难）
+
+==原题==
+
+给定一个未排序的整数数组 `nums`，找出其中没有出现的最小正整数。要求时间复杂度为 $O(n)$，并且只使用 $O(1)$ 的额外空间。
+
+* **示例 1：** 输入：`nums = [1,2,0]` -> 输出：`3`。
+* **示例 2：** 输入：`nums = [3,4,-1,1]` -> 输出：`2`。
+* **示例 3：** 输入：`nums = [7,8,9,11,12]` -> 输出：`1`。
+
+==答案==
+
+```python
+class Solution:
+    def firstMissingPositive(self, nums: List[int]) -> int:
+        n = len(nums)
+
+        # 把值 x 放到下标 x - 1 的位置
+        for index in range(n):
+            while 1 <= nums[index] <= n:
+                target = nums[index] - 1
+
+                # 目标位置已经是相同的值，继续交换会陷入死循环
+                if nums[target] == nums[index]:
+                    break
+
+                nums[index], nums[target] = nums[target], nums[index]
+
+        # 第一个不满足 nums[index] == index + 1 的位置就是答案
+        for index in range(n):
+            if nums[index] != index + 1:
+                return index + 1
+
+        return n + 1
+```
+
+==解析==
+
+* **为什么只关心 `1` 到 `n`**：长度为 `n` 的数组若包含 `1, 2, ..., n`，答案就是 `n + 1`；否则答案一定在 `1` 到 `n` 中。
+* **原地哈希关系**：数值 `x` 对应下标 `x - 1`。整理完成后，下标 `index` 的正确值应当是 `index + 1`。
+* **为什么使用 `while` 而不是 `if`**：一次交换后，当前位置换来的新元素可能仍然属于 `1` 到 `n`，还要继续把它放到正确位置。
+* **为什么检查重复值**：例如 `[1,1]` 中，第二个 `1` 的目标位置已经有 `1`。如果继续交换，相同状态会不断重复。
+* **为什么总体不是 $O(n^2)$**：虽然代码包含嵌套的 `while`，但每次有效交换至少会把一个值放到其正确位置。正确位置最多只有 `n` 个，因此所有交换合计为 $O(n)$。
+* **复杂度**：两次扫描加有限次交换，时间复杂度为 $O(n)$；直接复用输入数组，额外空间复杂度为 $O(1)$。
