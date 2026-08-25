@@ -243,7 +243,7 @@ LeetCode 后台是一个测试引擎。它会自动**导入**你写的 `Solution
 
 你可以按任意顺序返回答案。
 
-==答案==
+==答案（哈希表）==
 
 ```python
 class Solution:
@@ -278,7 +278,7 @@ class Solution:
 
 * **示例:** 输入: `strs = ["eat", "tea", "tan", "ate", "nat", "bat"]` -> 输出: `[["bat"],["nat","tan"],["ate","eat","tea"]]`
 
-==错误答案==
+==错误答案（排序 + 哈希分组）==
 
 ```python
 import collections
@@ -346,7 +346,7 @@ class Solution:
 
     同时 `return` 必须缩进在 `groupAnagrams` 函数内部，否则就不是函数的返回值了。
 
-==正确答案==
+==正确答案（排序 + 哈希分组）==
 
 ```python
 import collections
@@ -385,7 +385,7 @@ class Solution:
 * **示例:** 输入: `nums = [100,4,200,1,3,2]` -> 输出: `4`
 * **解释:** 最长数字连续序列是 `[1, 2, 3, 4]`。它的长度为 4。
 
-==答案==
+==答案（哈希集合 + 剪枝）==
 
 ```python
 class Solution:
@@ -515,7 +515,7 @@ class Solution:
 
 * **示例：** 输入：`nums = [0,1,0,3,12]` -> 修改后：`[1,3,12,0,0]`
 
-==错误答案==
+==错误答案（双指针）==
 
 ```python
 class Solution:
@@ -531,7 +531,7 @@ class Solution:
 
 `TypeError: 'int' object is not iterable`（整数对象不可迭代）。
 
-==答案==
+==答案（快慢双指针）==
 
 ```python
 class Solution:
@@ -566,7 +566,7 @@ class Solution:
 
 * **示例：** 输入：`height = [1,8,6,2,5,4,8,3,7]` -> 输出：`49`
 
-==答案==
+==答案（对撞双指针 + 贪心）==
 
 ```python
 class Solution:
@@ -618,7 +618,7 @@ class Solution:
 
 * **示例：** 输入：`nums = [-1,0,1,2,-1,-4]` -> 输出：`[[-1,-1,2],[-1,0,1]]`
 
-==答案==
+==答案（排序 + 双指针）==
 
 ```python
 class Solution:
@@ -683,7 +683,7 @@ class Solution:
 
 * **示例：** 输入：`height = [0,1,0,2,1,0,1,3,2,1,2,1]` -> 输出：`6`
 
-==答案==
+==答案（双指针）==
 
 ```python
 class Solution:
@@ -839,7 +839,7 @@ $$
 
 > 题目要求的是**子串**，字符在原字符串中必须连续；不是可以跳过字符的子序列。
 
-==错误答案==
+==错误答案（滑动窗口）==
 
 ```python
 class Solution:
@@ -868,7 +868,7 @@ class Solution:
 * `ans` 应在每次窗口合法后通过 `max()` 更新，而不是循环结束后只计算一次。
 * 正确窗口为 `[left, right]` 时，长度才是 `right - left + 1`。
 
-==答案==
+==答案（滑动窗口 + 哈希集合）==
 
 ```python
 class Solution:
@@ -912,7 +912,7 @@ class Solution:
 
 字母异位词使用的字符及其出现次数完全相同，只是排列顺序不同。因此，本题不需要比较字符串顺序，只需要比较字符频率。
 
-==答案==
+==答案（定长滑动窗口 + 频次数组）==
 
 ```python
 class Solution:
@@ -1163,7 +1163,7 @@ index = heap[0][1]   # 堆顶元素的下标
 * **示例 1：** 输入：`nums = [1,1,1]`，`k = 2` -> 输出：`2`。
 * **示例 2：** 输入：`nums = [1,2,3]`，`k = 3` -> 输出：`2`。
 
-==答案==
+==答案（前缀和 + 哈希表）==
 
 ```python
 class Solution:
@@ -1202,7 +1202,7 @@ class Solution:
 
 * **示例：** 输入：`nums = [1,3,-1,-3,5,3,6,7]`，`k = 3` -> 输出：`[3,3,5,5,6,7]`。
 
-==我的答案==
+==我的答案（暴力枚举窗口）==
 ```python
 class Solution:
     def maxSlidingWindow(self, nums: List[int], k: int) -> List[int]:
@@ -1359,7 +1359,7 @@ queue.pop()      # 从右边删：处理“数值不可能再成为最大值”
 * **示例 1：** 输入：`s = "ADOBECODEBANC"`，`t = "ABC"` -> 输出：`"BANC"`。
 * **示例 2：** 输入：`s = "a"`，`t = "aa"` -> 输出：`""`。
 
-==答案==
+==答案（滑动窗口 + 哈希计数）==
 
 ```python
 from collections import Counter, defaultdict
@@ -1520,7 +1520,7 @@ while 1 <= nums[index] <= n and nums[nums[index] - 1] != nums[index]:
 * **示例 1：** 输入：`nums = [-2,1,-3,4,-1,2,1,-5,4]` -> 输出：`6`，对应子数组 `[4,-1,2,1]`。
 * **示例 2：** 输入：`nums = [1]` -> 输出：`1`。
 
-==答案==
+==答案（动态规划 / Kadane 算法）==
 
 ```python
 class Solution:
@@ -1555,7 +1555,7 @@ class Solution:
 * **示例 1：** 输入：`intervals = [[1,3],[2,6],[8,10],[15,18]]` -> 输出：`[[1,6],[8,10],[15,18]]`。
 * **示例 2：** 输入：`intervals = [[1,4],[4,5]]` -> 输出：`[[1,5]]`。
 
-==答案==
+==答案（排序 + 贪心）==
 
 ```python
 class Solution:
@@ -1593,7 +1593,7 @@ class Solution:
 * **示例 1：** 输入：`nums = [1,2,3,4,5,6,7]`，`k = 3` -> 修改后：`[5,6,7,1,2,3,4]`。
 * **示例 2：** 输入：`nums = [-1,-100,3,99]`，`k = 2` -> 修改后：`[3,99,-1,-100]`。
 
-==答案==
+==答案（三次反转）==
 
 ```python
 class Solution:
@@ -1631,7 +1631,7 @@ class Solution:
 * **示例 1：** 输入：`nums = [1,2,3,4]` -> 输出：`[24,12,8,6]`。
 * **示例 2：** 输入：`nums = [-1,1,0,-3,3]` -> 输出：`[0,0,9,0,0]`。
 
-==答案==
+==答案（前缀积 + 后缀积）==
 
 ```python
 class Solution:
@@ -1674,7 +1674,7 @@ class Solution:
 * **示例 2：** 输入：`nums = [3,4,-1,1]` -> 输出：`2`。
 * **示例 3：** 输入：`nums = [7,8,9,11,12]` -> 输出：`1`。
 
-==答案==
+==答案（原地哈希 / 循环置换）==
 
 ```python
 class Solution:
