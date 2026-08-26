@@ -1560,24 +1560,25 @@ class Solution:
 ```python
 class Solution:
     def merge(self, intervals: List[List[int]]) -> List[List[int]]:
-        intervals.sort(key=lambda interval: interval[0])
+        intervals.sort(key=lambda x: x[0])
         merged = []
 
-        for left, right in intervals:
+        for interval in intervals:
             # 没有结果，或当前区间与最后一个区间完全分离
-            if not merged or left > merged[-1][1]:
-                merged.append([left, right])
+            if not merged or merged[-1][1] < interval[0]:
+                merged.append(interval)
             else:
                 # 有重叠时只需要扩展右端点
-                merged[-1][1] = max(merged[-1][1], right)
+                merged[-1][1] = max(merged[-1][1], interval[1])
 
         return merged
 ```
 
 ==解析==
 
+* **`lambda x: x[0]`**：它是一个简写的匿名函数，等价于 `def get_left(x): return x[0]`。其中 `x` 会依次代表 `intervals` 中的每个区间，`x[0]` 就是该区间的左端点，因此 `sort` 会按左端点排序。
 * **为什么先排序**：按左端点排序后，当前区间不可能与更早的区间重叠，却跳过结果中的最后一个区间，因此只需比较 `merged[-1]`。
-* **重叠条件**：如果 `left <= merged[-1][1]`，两个闭区间相交或相接，应当合并。
+* **重叠条件**：如果 `interval[0] <= merged[-1][1]`，两个闭区间相交或相接，应当合并。
 * **为什么右端点取最大值**：当前区间可能被上一个区间完全包含，不能直接把右端点赋值为 `right`。
 * **结果为什么存列表**：题目要求返回 `List[List[int]]`，所以加入结果时使用 `[left, right]`，而不是元组。
 * **复杂度**：排序需要 $O(n \log n)$，扫描需要 $O(n)$，总时间复杂度为 $O(n \log n)$；结果数组所需空间为 $O(n)$，若不计返回值，额外空间取决于排序实现。

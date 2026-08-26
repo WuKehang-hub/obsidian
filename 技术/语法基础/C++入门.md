@@ -4,7 +4,7 @@ tags:
   - 编程
 date: 2026-08-17
 ---
- # C++基础篇
+1 # C++基础篇
 
 ## 1 C++初识
 
@@ -2878,7 +2878,7 @@ int main() {
 
 ​由编译器自动分配释放, 存放函数的参数值,局部变量等
 
-​注意事项：不要返回局部变量的地址，栈区开辟的数据由编译器自动释放
+​注意事项：**不要返回局部变量的地址**，栈区开辟的数据由编译器自动释放
 
 **示例：**
 
@@ -3092,8 +3092,6 @@ int main() {
 	mySwap03(a, b);
 	cout << "a:" << a << " b:" << b << endl;
 
-	system("pause");
-
 	return 0;
 }
 
@@ -3120,7 +3118,7 @@ int& test01() {
 
 //返回静态变量引用
 int& test02() {
-	static int a = 20;
+	static int a = 20; //静态变量，存放在全局区，全局区在程序结束后系统释放
 	return a;
 }
 
@@ -3140,8 +3138,6 @@ int main() {
 
 	cout << "ref2 = " << ref2 << endl;
 	cout << "ref2 = " << ref2 << endl;
-
-	system("pause");
 
 	return 0;
 }
@@ -3193,7 +3189,7 @@ void showValue(const int& v) {
 int main() {
 
 	//int& ref = 10;  引用本身需要一个合法的内存空间，因此这行错误
-	//加入const就可以了，编译器优化代码，int temp = 10; const int& ref = temp;
+	//但是加入const就可以，因为编译器会自动优化代码，int temp = 10; const int& ref = temp;
 	const int& ref = 10;
 
 	//ref = 100;  //加入const后不可以修改变量
@@ -3202,8 +3198,6 @@ int main() {
 	//函数中利用常量引用防止误操作修改实参
 	int a = 10;
 	showValue(a);
-
-	system("pause");
 
 	return 0;
 }
@@ -3236,8 +3230,6 @@ int main() {
 	cout << "ret = " << func(20, 20) << endl;
 	cout << "ret = " << func(100) << endl;
 
-	system("pause");
-
 	return 0;
 }
 ```
@@ -3253,7 +3245,7 @@ C++中函数的形参列表里可以有占位参数，用来做占位，调用�
 **示例：**
 
 ```C++
-//函数占位参数 ，占位参数也可以有默认参数
+//函数占位参数，占位参数也可以有默认参数
 void func(int a, int) {
 	cout << "this is func" << endl;
 }
