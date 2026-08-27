@@ -4083,6 +4083,7 @@ public:
 		cout << "mB:" << m_B << endl;
 		cout << "mC:" << m_C << endl;
 	}
+
 private:
 	int m_A;
 	int m_B;
@@ -4093,9 +4094,6 @@ int main() {
 
 	Person p(1, 2, 3);
 	p.PrintPerson();
-
-
-	system("pause");
 
 	return 0;
 }
@@ -4140,7 +4138,6 @@ public:
 
 };
 
-
 class Person
 {
 public:
@@ -4180,10 +4177,15 @@ int main() {
 
 	test01();
 
-	system("pause");
-
 	return 0;
 }
+/*
+Phone构造
+Person构造
+张三 使用苹果X 牌手机! 
+Person析构
+Phone析构
+*/
 ```
 
 #### 4.2.8 静态成员
@@ -4218,7 +4220,8 @@ public:
 private:
 	static int m_B; //静态成员变量也是有访问权限的
 };
-int Person::m_A = 10;
+
+int Person::m_A = 10; //类外初始化
 int Person::m_B = 10;
 
 void test01()
@@ -4228,11 +4231,11 @@ void test01()
 	//1、通过对象
 	Person p1;
 	p1.m_A = 100;
-	cout << "p1.m_A = " << p1.m_A << endl;
+	cout << "p1.m_A = " << p1.m_A << endl; //100
 
 	Person p2;
 	p2.m_A = 200;
-	cout << "p1.m_A = " << p1.m_A << endl; //共享同一份数据
+	cout << "p1.m_A = " << p1.m_A << endl; //共享同一份数据，200
 	cout << "p2.m_A = " << p2.m_A << endl;
 
 	//2、通过类名
@@ -4252,9 +4255,7 @@ int main() {
 }
 ```
 
-
-
-**示例2：**静态成员函数
+**示例2：** 静态成员函数
 
 ```C++
 class Person
@@ -4275,6 +4276,7 @@ public:
 
 	static int m_A; //静态成员变量
 	int m_B; // 
+
 private:
 
 	//静态成员函数也是有访问权限的
@@ -4325,7 +4327,7 @@ public:
 	Person() {
 		mA = 0;
 	}
-	//非静态成员变量占对象空间
+	//非静态成员变量占对象空间 4
 	int mA;
 	//静态成员变量不占对象空间
 	static int mB; 
@@ -4338,12 +4340,17 @@ public:
 	}
 };
 
+int Person::mB=0;
+
+class Car{
+};
+
 int main() {
 
 	cout << sizeof(Person) << endl;
-
-	system("pause");
-
+	
+	cout<<sizeof(Car)<<endl;//1 空对象占用内存为1,C++编译器会给每个空对象都分配一个字节空间，是为了区分空对象占用内存位置
+	
 	return 0;
 }
 ```
@@ -4356,22 +4363,16 @@ int main() {
 
 那么问题是：这一块代码是如何区分那个对象调用自己的呢？
 
-
-
 c++通过提供特殊的对象指针，this指针，解决上述问题。**this指针指向被调用的成员函数所属的对象**
-
-
 
 this指针是隐含每一个非静态成员函数内的一种指针
 
 this指针不需要定义，直接使用即可
 
-
-
 this指针的用途：
 
 *  当形参和成员变量同名时，可用this指针来区分
-*  在类的非静态成员函数中返回对象本身，可使用return *this
+*  在类的非静态成员函数中返回对象本身，可使用return \*this
 
 ```C++
 class Person
@@ -4384,11 +4385,12 @@ public:
 		this->age = age;
 	}
 
+	//Person&是返回引用，如果写Person PersonAddPerson(Person p)，那就是返回复制
 	Person& PersonAddPerson(Person p)
 	{
 		this->age += p.age;
-		//返回对象本身
-		return *this;
+		//this指向p2的指针，*this指向的就是p2这个对象本体
+		return *this; 
 	}
 
 	int age;
@@ -4400,6 +4402,7 @@ void test01()
 	cout << "p1.age = " << p1.age << endl;
 
 	Person p2(10);
+	//想要链式编程无限追加，就需要返回值还是p2本体
 	p2.PersonAddPerson(p1).PersonAddPerson(p1).PersonAddPerson(p1);
 	cout << "p2.age = " << p2.age << endl;
 }
@@ -4407,8 +4410,6 @@ void test01()
 int main() {
 
 	test01();
-
-	system("pause");
 
 	return 0;
 }
