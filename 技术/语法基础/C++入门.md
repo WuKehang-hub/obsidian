@@ -4433,10 +4433,7 @@ public:
 	}
 
 	void ShowPerson() {
-		if (this == NULL) {
-			return;
-		}
-		cout << mAge << endl;
+		cout << mAge << endl;//因为 `showAge()` 是非静态成员函数，它背后有一个隐藏的this指针，所以mAge其实是this->mAge
 	}
 
 public:
@@ -4446,6 +4443,7 @@ public:
 void test01()
 {
 	Person * p = NULL;
+	//p->ShowClassName();等价于(*p).ShowClassName();
 	p->ShowClassName(); //空指针，可以调用成员函数
 	p->ShowPerson();  //但是如果成员函数中用到了this指针，就不可以了
 }
@@ -4453,8 +4451,6 @@ void test01()
 int main() {
 
 	test01();
-
-	system("pause");
 
 	return 0;
 }
