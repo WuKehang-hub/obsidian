@@ -4533,17 +4533,13 @@ int main() {
 
 友元的目的就是让一个函数或者类 访问另一个类中私有成员
 
-友元的关键字为  ==friend==
+友元的关键字为==friend==
 
 友元的三种实现
 
 * 全局函数做友元
 * 类做友元
 * 成员函数做友元
-
-
-
-
 
 #### 4.4.1 全局函数做友元
 
@@ -4561,7 +4557,6 @@ public:
 		this->m_BedRoom = "卧室";
 	}
 
-
 public:
 	string m_SittingRoom; //客厅
 
@@ -4569,13 +4564,11 @@ private:
 	string m_BedRoom; //卧室
 };
 
-
 void goodGay(Building * building)
 {
 	cout << "好基友正在访问： " << building->m_SittingRoom << endl;
 	cout << "好基友正在访问： " << building->m_BedRoom << endl;
 }
-
 
 void test01()
 {
@@ -4586,17 +4579,12 @@ void test01()
 int main(){
 
 	test01();
-
-	system("pause");
+	
 	return 0;
 }
 ```
 
-
-
 #### 4.4.2 类做友元
-
-
 
 ```C++
 class Building;
@@ -4653,19 +4641,12 @@ void test01()
 int main(){
 
 	test01();
-
-	system("pause");
+	
 	return 0;
 }
 ```
 
-
-
-
-
 #### 4.4.3 成员函数做友元
-
-
 
 ```C++
 
@@ -4681,7 +4662,6 @@ public:
 private:
 	Building *building;
 };
-
 
 class Building
 {
@@ -4731,34 +4711,17 @@ int main(){
     
 	test01();
 
-	system("pause");
 	return 0;
 }
 ```
 
-
-
-
-
-
-
-
-
 ### 4.5 运算符重载
-
-
 
 运算符重载概念：对已有的运算符重新进行定义，赋予其另一种功能，以适应不同的数据类型
 
-
-
 #### 4.5.1 加号运算符重载
 
-
-
 作用：实现两个自定义数据类型相加的运算
-
-
 
 ```C++
 class Person {
@@ -4776,7 +4739,6 @@ public:
 		temp.m_B = this->m_B + p.m_B;
 		return temp;
 	}
-
 
 public:
 	int m_A;
@@ -4825,25 +4787,13 @@ int main() {
 }
 ```
 
-
-
 > 总结1：对于内置的数据类型的表达式的的运算符是不可能改变的
 
 > 总结2：不要滥用运算符重载
 
-
-
-
-
-
-
 #### 4.5.2 左移运算符重载
 
-
-
 作用：可以输出自定义数据类型
-
-
 
 ```C++
 class Person {
