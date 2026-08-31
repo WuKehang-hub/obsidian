@@ -1,0 +1,9 @@
+# Local Claudian conversations, sessions, and settings
+.claudian/
+
+# Local Obsidian configuration, plugins, and workspace state
+.obsidian/
+
+# macOS and Windows metadata files
+.DS_Store
+Thumbs.db
