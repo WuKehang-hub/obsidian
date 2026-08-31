@@ -5,7 +5,7 @@ tags:
 date: 2025-03-04
 ---
 
-![[Assets/python-intro/cover.png|720]]
+![cover](../../Assets/python-intro/cover.png)
 
 # 写在开头
 

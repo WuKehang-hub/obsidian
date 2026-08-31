@@ -4771,7 +4771,6 @@ void test() {
 	Person p3 = p2 + p1;  //相当于 p2.operaor+(p1)
 	cout << "mA:" << p3.m_A << " mB:" << p3.m_B << endl;
 
-
 	Person p4 = p3 + 10; //相当于 operator+(p3,10)
 	cout << "mA:" << p4.m_A << " mB:" << p4.m_B << endl;
 
@@ -4781,11 +4780,41 @@ int main() {
 
 	test();
 
-	system("pause");
-
 	return 0;
 }
 ```
+
+我个人更喜欢全局函数实现 + 号运算符重载，可读性更高
+
+==为什么类还没定义完，就能把`Person`写成返回值？==
+
+当编译器读到 `class Person {` 时，类名 `Person` 就已经生效了。此时它暂时是一个**不完整类型**：编译器知道它是一种类型，只是还不知道它最终占用多少内存。
+
+不完整类型可以用于声明函数的返回类型、指针和引用，因此下面的写法合法：
+
+```cpp
+Person operator+(const Person& p);
+```
+
+函数签名在这里仅说明“接收什么、返回什么”，不需要立即创建 `Person` 对象。成员函数的函数体属于**完整类上下文**，因此在函数体中也可以创建 `Person temp` 并访问其成员：
+
+```cpp
+Person operator+(const Person& p) {
+    Person temp; // 合法
+    return temp;
+}
+```
+
+但是，类中不能直接包含一个同类型的成员对象：
+
+```cpp
+class Person {
+    Person other; // 错误：Person 中又包含 Person，会无限嵌套
+    Person* ptr;  // 正确：指针的大小是确定的
+};
+```
+
+> 简单理解：**类还没定义完，但类名已经可以使用；需要知道对象具体大小的地方，则必须等类型完整。**
 
 > 总结1：对于内置的数据类型的表达式的的运算符是不可能改变的
 

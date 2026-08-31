@@ -6,7 +6,7 @@ tags:
 date: 2025-03-19
 ---
 
-![[Assets/yaml-syntax/cover.jpg|720]]
+![cover](../../Assets/yaml-syntax/cover.jpg)
 
 # 什么是YAML
 

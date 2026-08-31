@@ -4,7 +4,7 @@ tags:
 date: 2026-03-13
 ---
 
-![[Assets/latex-tips/cover.webp|720]]
+![cover](../../Assets/latex-tips/cover.webp)
 
 研一下，已经是开始写论文的阶段了。**Latex**相比于**Word**，在编写的时候不那么直观，但是胜在省事，不用纠结格式。
 
