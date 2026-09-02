@@ -7139,8 +7139,6 @@ int main() {
 	test01();
 	test02();
 
-	system("pause");
-
 	return 0;
 }
 ```
@@ -7188,8 +7186,6 @@ void test01()
 int main() {
 
 	test01();
-
-	system("pause");
 
 	return 0;
 }
