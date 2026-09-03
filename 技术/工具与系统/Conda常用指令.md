@@ -289,6 +289,39 @@ where python
 python -m pip --version
 ```
 
+# 以 editable 模式安装本地项目
+
+开发 Python 项目时，可以使用 `-e` 选项进行可编辑安装：
+
+```bash
+conda activate robot
+cd /path/to/project
+python -m pip install -e .
+```
+
+其中：
+
+- `-e` 是 `--editable` 的缩写；
+- `.` 表示安装当前目录中的项目；
+- 安装后可以像普通 Python 包一样导入该项目；
+- 环境会直接引用本地源码，修改代码后通常无须重新安装。
+
+例如，将 `rsl_rl` 安装到当前 Conda 环境：
+
+```bash
+conda activate robot
+cd /path/to/rsl_rl
+python -m pip install -e .
+```
+
+> 必须在运行项目所使用的同一个 Conda 环境中执行安装，否则运行时可能出现 `ModuleNotFoundError`。
+
+editable 安装依赖原项目目录，因此安装后不要随意删除或移动源码目录。需要取消安装时，使用项目的包名卸载：
+
+```bash
+python -m pip uninstall package_name
+```
+
 # 导出和恢复环境
 
 将当前环境导出为 YAML 文件：
@@ -325,23 +358,6 @@ conda env update -n robot -f environment.yml --prune
 | `conda env export --from-history` | 只记录主动安装的主要包 | 分享项目、跨电脑创建环境 |
 
 # 常见问题
-
-## `conda activate` 无法使用
-
-如果提示需要先执行 `conda init`，Bash 用户可以运行：
-
-```bash
-conda init bash
-source ~/.bashrc
-```
-
-PowerShell 用户可以运行：
-
-```powershell
-conda init powershell
-```
-
-执行后重新打开终端。
 
 
 ## 依赖冲突
